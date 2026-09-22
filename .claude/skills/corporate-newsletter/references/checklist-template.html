@@ -7,10 +7,12 @@ This file is a template. Each week, copy it to your scratchpad, then:
    the example entries with the real items found in Step 2 of SKILL.md. Each item is:
 
    {
-     "id": 1,                         // sequential 1..N across ALL sections, no gaps, no reuse
-     "section": "Tax & Compliance",   // group heading — theme it the way you would for the
-                                       // final newsletter (see SKILL.md Step 3), not one section
-                                       // per source
+     "id": 1,                         // sequential 1..N, no gaps, no reuse
+     "group": "Tax compliance",       // a loose scan-order grouping, purely for readability —
+                                       // this newsletter has one section ("Corporate Tax and
+                                       // Trade", see SKILL.md Step 4), so this label is NOT a
+                                       // final newsletter section, just a way to break up a
+                                       // long list on this page
      "headline": "...",               // the article headline, verbatim or lightly trimmed
      "url": "https://...",            // hyperlink target
      "source": "Avalara",             // from the Source column of CTT_NL_Sources.csv
@@ -22,8 +24,8 @@ This file is a template. Each week, copy it to your scratchpad, then:
                                        //   "possible repeat — similar item in archive, verify"
    }
 
-2. Keep `id` numbering continuous across sections (section A: 1-4, section B: 5-9, etc.) —
-   the user's reply refers to these numbers, e.g. "Include 1, 3, 7" or via the Categorize tab.
+2. Keep `id` numbering continuous (1..N) — the user's reply refers to these numbers,
+   e.g. "Include these numbered items in the newsletter: 1, 3, 7".
 
 3. List any sources that couldn't be scanned at all as plain text in your chat message
    below the artifact — they don't belong in this file, there's nothing to check for them.
@@ -33,8 +35,8 @@ This file is a template. Each week, copy it to your scratchpad, then:
    of a given week's artifact; omit it on any re-publish to the same file/URL so the
    icon doesn't change). Do not change the title/icon week to week.
 
-5. Nothing else in this file should need editing — the two tabs, the copy buttons, and
-   the output string formats are already wired up to read from ITEMS.
+5. Nothing else in this file should need editing — the checkboxes, the copy button, and
+   the output string format are already wired up to read from ITEMS.
 
 6. This file is written as Artifact page CONTENT, not a full document: no <!DOCTYPE>,
    <html>, <head>, or <body> tags — the Artifact tool wraps those in automatically at
@@ -49,7 +51,6 @@ This file is a template. Each week, copy it to your scratchpad, then:
     --text: #1B2523;
     --muted: #667370;
     --accent: #0F6D63;
-    --accent-soft: #E3F3EE;
     --tag-bg: #FFF4E0;
     --tag-text: #8A5A00;
     --btn-text: #ffffff;
@@ -62,7 +63,6 @@ This file is a template. Each week, copy it to your scratchpad, then:
       --text: #E9F2F0;
       --muted: #9AAFAB;
       --accent: #4FCBAF;
-      --accent-soft: #1E3A34;
       --tag-bg: #3A2E14;
       --tag-text: #F0C674;
       --btn-text: #0A1614;
@@ -75,7 +75,6 @@ This file is a template. Each week, copy it to your scratchpad, then:
     --text: #E9F2F0;
     --muted: #9AAFAB;
     --accent: #4FCBAF;
-    --accent-soft: #1E3A34;
     --tag-bg: #3A2E14;
     --tag-text: #F0C674;
     --btn-text: #0A1614;
@@ -90,14 +89,6 @@ This file is a template. Each week, copy it to your scratchpad, then:
   .wrap { max-width: 760px; margin: 0 auto; padding: 20px 16px 60px; }
   h1 { font-size: 20px; margin: 4px 0 2px; color: var(--accent); }
   .sub { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
-  .tabs { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
-  .tab-btn {
-    background: none; border: none; padding: 10px 4px; font-size: 14px; font-weight: 600;
-    color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
-  }
-  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
-  .panel { display: none; }
-  .panel.active { display: block; }
   .section-heading {
     font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
     color: var(--accent); margin: 22px 0 8px; padding-top: 10px; border-top: 1px solid var(--border);
@@ -118,25 +109,15 @@ This file is a template. Each week, copy it to your scratchpad, then:
     display: inline-block; margin-top: 4px; font-size: 11px; padding: 2px 7px; border-radius: 999px;
     background: var(--tag-bg); color: var(--tag-text);
   }
-  .catrow .item-body { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: baseline; }
-  .catrow .item-text { flex: 1 1 260px; min-width: 0; }
-  .catrow input[type="text"] {
-    flex: 0 1 180px; min-width: 120px; padding: 6px 8px; font-size: 13px; border: 1px solid var(--border);
-    border-radius: 6px; background: var(--bg); color: var(--text);
-  }
   .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 18px 0; }
   button.action {
     background: var(--accent); color: var(--btn-text); border: none; border-radius: 8px;
     padding: 9px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
   }
   button.action:hover { opacity: 0.9; }
-  button.ghost {
-    background: none; border: 1px solid var(--border); color: var(--text); border-radius: 8px;
-    padding: 9px 14px; font-size: 13px; cursor: pointer;
-  }
   .count { font-size: 12px; color: var(--muted); }
   textarea.output {
-    width: 100%; margin-top: 10px; min-height: 70px; font-family: ui-monospace, monospace;
+    width: 100%; margin-top: 10px; min-height: 60px; font-family: ui-monospace, monospace;
     font-size: 12.5px; padding: 10px; border: 1px solid var(--border); border-radius: 8px;
     background: var(--panel); color: var(--text); resize: vertical;
   }
@@ -145,15 +126,9 @@ This file is a template. Each week, copy it to your scratchpad, then:
 </style>
 <div class="wrap">
   <h1>Corporates Wire Desk</h1>
-  <div class="sub">Check what belongs in this week's issue. Use <strong>Select</strong> for a plain yes/no pass, or <strong>Categorize</strong> to also assign a section — either way, hit Copy and paste the result back into chat.</div>
+  <div class="sub">Check what belongs in this week's issue, then hit Copy and paste the result back into chat. Everything runs under one section (Corporate Tax and Trade) — the groupings below are just to make a long list easier to scan.</div>
 
-  <div class="tabs">
-    <button class="tab-btn active" data-tab="select">Select</button>
-    <button class="tab-btn" data-tab="categorize">Categorize</button>
-  </div>
-
-  <div class="panel active" id="panel-select"></div>
-  <div class="panel" id="panel-categorize"></div>
+  <div id="list"></div>
 
   <div class="toolbar">
     <button class="action" id="copy-btn">Copy</button>
@@ -165,18 +140,17 @@ This file is a template. Each week, copy it to your scratchpad, then:
 
 <script type="application/json" id="items-data">
 [
-  { "id": 1, "section": "Tax & Compliance", "headline": "Example: Avalara launches new e-invoicing module for EU VAT", "url": "https://example.com/1", "source": "Avalara", "date": "Sep 18, 2026", "tag": "" },
-  { "id": 2, "section": "Tax & Compliance", "headline": "Example: Sovos partners with a regional ERP vendor", "url": "https://example.com/2", "source": "Sovos", "date": "Sep 19, 2026", "tag": "" },
-  { "id": 3, "section": "Legal & Risk", "headline": "Example: Wolters Kluwer announces AI feature for contract review", "url": "https://example.com/3", "source": "Wolters Kluwer", "date": "Sep 17, 2026", "tag": "borderline relevance — flagging rather than dropping" },
-  { "id": 4, "section": "Funding & M&A", "headline": "Example: Kintsugi raises Series B", "url": "https://example.com/4", "source": "Kintsugi (LinkedIn)", "date": "Sep 20, 2026", "tag": "found via web search — not a direct site scan, verify before use" }
+  { "id": 1, "group": "Tax compliance", "headline": "Example: Avalara launches new e-invoicing module for EU VAT", "url": "https://example.com/1", "source": "Avalara", "date": "Sep 18, 2026", "tag": "" },
+  { "id": 2, "group": "Tax compliance", "headline": "Example: Sovos partners with a regional ERP vendor", "url": "https://example.com/2", "source": "Sovos", "date": "Sep 19, 2026", "tag": "" },
+  { "id": 3, "group": "Legal & risk", "headline": "Example: Wolters Kluwer announces AI feature for contract review", "url": "https://example.com/3", "source": "Wolters Kluwer", "date": "Sep 17, 2026", "tag": "borderline relevance — flagging rather than dropping" },
+  { "id": 4, "group": "Funding & M&A", "headline": "Example: Kintsugi raises Series B", "url": "https://example.com/4", "source": "Kintsugi (LinkedIn)", "date": "Sep 20, 2026", "tag": "found via web search — not a direct site scan, verify before use" }
 ]
 </script>
 
 <script>
 (function () {
   var ITEMS = JSON.parse(document.getElementById('items-data').textContent);
-  var selected = {};   // id -> bool
-  var categories = {}; // id -> string
+  var selected = {}; // id -> bool
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
@@ -184,19 +158,19 @@ This file is a template. Each week, copy it to your scratchpad, then:
     });
   }
 
-  function groupBySection(items) {
+  function groupByGroup(items) {
     var order = [], map = {};
     items.forEach(function (it) {
-      if (!map[it.section]) { map[it.section] = []; order.push(it.section); }
-      map[it.section].push(it);
+      if (!map[it.group]) { map[it.group] = []; order.push(it.group); }
+      map[it.group].push(it);
     });
-    return order.map(function (s) { return { section: s, items: map[s] }; });
+    return order.map(function (g) { return { group: g, items: map[g] }; });
   }
 
-  function renderSelect() {
+  function render() {
     var html = "";
-    groupBySection(ITEMS).forEach(function (grp) {
-      html += '<div class="section-heading">' + esc(grp.section) + '</div>';
+    groupByGroup(ITEMS).forEach(function (grp) {
+      html += '<div class="section-heading">' + esc(grp.group) + '</div>';
       grp.items.forEach(function (it) {
         html += '' +
           '<label class="item-row">' +
@@ -210,40 +184,7 @@ This file is a template. Each week, copy it to your scratchpad, then:
           '</label>';
       });
     });
-    document.getElementById('panel-select').innerHTML = html;
-  }
-
-  function renderCategorize() {
-    var html = "";
-    groupBySection(ITEMS).forEach(function (grp) {
-      html += '<div class="section-heading">' + esc(grp.section) + ' <span style="color:var(--muted);font-weight:400;">(scanned as)</span></div>';
-      grp.items.forEach(function (it) {
-        html += '' +
-          '<div class="item-row catrow">' +
-            '<input type="checkbox" data-id="' + it.id + '" class="cat-check">' +
-            '<span class="item-num">#' + it.id + '</span>' +
-            '<span class="item-body">' +
-              '<span class="item-text">' +
-                '<div class="item-headline"><a href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.headline) + '</a></div>' +
-                '<div class="item-meta">' + esc(it.source) + ' &middot; ' + esc(it.date) + '</div>' +
-                (it.tag ? '<div class="item-tag">' + esc(it.tag) + '</div>' : '') +
-              '</span>' +
-              '<input type="text" data-id="' + it.id + '" class="cat-input" placeholder="Section name&hellip;">' +
-            '</span>' +
-          '</div>';
-      });
-    });
-    document.getElementById('panel-categorize').innerHTML = html;
-  }
-
-  function syncCheckboxesToState() {
-    document.querySelectorAll('.sel-check, .cat-check').forEach(function (cb) {
-      cb.checked = !!selected[cb.getAttribute('data-id')];
-    });
-    document.querySelectorAll('.cat-input').forEach(function (inp) {
-      inp.value = categories[inp.getAttribute('data-id')] || "";
-    });
-    updateCount();
+    document.getElementById('list').innerHTML = html;
   }
 
   function updateCount() {
@@ -252,44 +193,16 @@ This file is a template. Each week, copy it to your scratchpad, then:
   }
 
   document.addEventListener('change', function (e) {
-    if (e.target.classList.contains('sel-check') || e.target.classList.contains('cat-check')) {
-      var id = e.target.getAttribute('data-id');
-      selected[id] = e.target.checked;
-      syncCheckboxesToState();
-    }
-    if (e.target.classList.contains('cat-input')) {
-      categories[e.target.getAttribute('data-id')] = e.target.value;
+    if (e.target.classList.contains('sel-check')) {
+      selected[e.target.getAttribute('data-id')] = e.target.checked;
+      updateCount();
     }
   });
-
-  document.querySelectorAll('.tab-btn').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
-      document.querySelectorAll('.panel').forEach(function (p) { p.classList.remove('active'); });
-      btn.classList.add('active');
-      document.getElementById('panel-' + btn.getAttribute('data-tab')).classList.add('active');
-      syncCheckboxesToState();
-    });
-  });
-
-  function currentTab() {
-    return document.querySelector('.tab-btn.active').getAttribute('data-tab');
-  }
 
   function buildOutput() {
     var ids = Object.keys(selected).filter(function (k) { return selected[k]; }).map(Number).sort(function (a, b) { return a - b; });
     if (!ids.length) return "";
-    if (currentTab() === 'select') {
-      return "Include these numbered items in the newsletter: " + ids.join(", ");
-    }
-    var groups = {}, order = [];
-    ids.forEach(function (id) {
-      var cat = (categories[id] || "").trim() || "Uncategorized";
-      if (!groups[cat]) { groups[cat] = []; order.push(cat); }
-      groups[cat].push(id);
-    });
-    var parts = order.map(function (cat) { return cat + ": " + groups[cat].join(", "); });
-    return "Include these numbered items in the newsletter, grouped as follows: " + parts.join(" / ");
+    return "Include these numbered items in the newsletter: " + ids.join(", ");
   }
 
   document.getElementById('copy-btn').addEventListener('click', function () {
@@ -311,8 +224,7 @@ This file is a template. Each week, copy it to your scratchpad, then:
     }
   });
 
-  renderSelect();
-  renderCategorize();
+  render();
   updateCount();
 })();
 </script>

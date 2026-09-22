@@ -1,43 +1,47 @@
 # House style — Corporates Newsletter
 
-This is the HTML skeleton and formatting rules for the weekly Corporates Newsletter. Fill it in during Step 4/5 of `SKILL.md`. The final artifact gets copied as rendered rich text and pasted into Outlook, so every rule below exists to survive that round-trip: table-based layout, inline styles only, no `<style>` blocks, no flexbox/grid/`position`, no external CSS or JS. Outlook's rendering engine (Word) only reliably honors inline styles on `<table>`/`<td>`/`<font>`-era markup.
+This is the HTML skeleton and formatting rules for the weekly Corporates Newsletter. Fill it in during Step 4/5 of `SKILL.md`. It's derived directly from `Corporates Newsletter format.html` at the repository root — a real past issue (exported from the newsletter's actual send platform) — so when in doubt, that file is the ground truth and this document is just a distilled version of it for filling in each week without re-reading 800 lines of markup.
+
+The final artifact gets copied as rendered rich text and pasted into Outlook, so every rule below exists to survive that round-trip: table-based layout, inline styles only, no `<style>` blocks, no flexbox/grid/`position`, no external CSS or JS. Outlook's rendering engine (Word) only reliably honors inline styles on `<table>`/`<td>`/`<font>`-era markup.
 
 ## Colors
 
-Pulled from `Masthead.png` / `Footer.png` so the HTML matches the fixed images exactly:
+Sampled directly from `Masthead.png` and the footer images so the HTML matches them exactly:
 
 | Use | Hex |
 |---|---|
-| Masthead background (light mint) | `#E3F3EE` |
-| Primary teal (section bars, headline accents) | `#0F6D63` |
-| Secondary teal (links, meta text) | `#2C6E62` |
-| Body text | `#222222` |
-| Meta / muted text | `#666666` |
-| Section divider | `#DDDDDD` |
-| Footer light box | `#F5F5F5` |
+| Masthead / page background (light mint) | `#E3F3EE` |
+| Dark green (masthead top bar, section headers) | `#123121` |
+| Muted grey (date line, footer subscribe line) | `#7E8C8D` |
+| Article link color | `#1155CC` |
+| AI-generated note | `#999999` |
 
-## Embedding the masthead and footer images
+## Images: Masthead.png, FooterTop.png, FooterBottom.png
 
-`Masthead.png` and `Footer.png` live at the repository root and never change week to week. Don't try to base64-encode or shell out to embed them — there's no script execution here. Instead, pass them straight through the `Artifact` tool's `files` parameter on every publish call in Step 3/5 that needs them:
+Three fixed images live at the repository root and don't change week to week:
+
+- `Masthead.png` — the full masthead, **including the "Corporates Newsletter" title and tagline already baked into the image**. Don't add an HTML title overlay on top of it; that would duplicate the title. Just place the image and move on.
+- `FooterTop.png` / `FooterBottom.png` — the footer's "Quick links and resources" box and the Thomson Reuters logo, split into two images with a gap between them. The gap exists on purpose: the subscribe line goes in that gap as real HTML text (see below), not baked into either image. Don't try to recombine them into one file.
+
+Don't try to base64-encode or shell out to embed any of these — there's no script execution here. Instead, pass them straight through the `Artifact` tool's `files` parameter on every publish call in Step 3/5 that needs them:
 
 ```
-files: { "Masthead.png": "Masthead.png", "Footer.png": "Footer.png" }
+files: { "Masthead.png": "Masthead.png", "FooterTop.png": "FooterTop.png", "FooterBottom.png": "FooterBottom.png" }
 ```
 
 Then reference them by that same relative path in the HTML `<img src>` — the Artifact tool serves them alongside the page, and the browser resolves them to absolute URLs when the user copies the rendered content, so the image keeps working after paste into Outlook (as a normal linked image, same as any marketing email — this is standard, not a bug):
 
 ```html
-<img src="Masthead.png" width="640" alt="" style="display:block;width:100%;max-width:640px;height:auto;border:0;">
+<img src="Masthead.png" width="650" alt="Corporates Newsletter" style="display:block;width:100%;max-width:650px;height:auto;border:0;">
 ```
 
-## Summary length depends on the category
+## Article format is uniform across every section
 
-Check the category name for **every** article before writing its summary — it's easy to default to one style for the whole draft and get later sections wrong.
+Unlike an earlier draft of this house style, the real reference issue does **not** give any one section a longer paragraph treatment — every section, "top" or not, uses the same format: one fully neutral, factual sentence per article, active voice, and the *entire sentence* (not just the company name) is the hyperlink. Cover what happened and, if relevant, the stated business reason (e.g. "to expand into the EU e-invoicing market") — no separate headline/summary split, no opinion, no editorializing, no "impressively" / "unfortunately" / competitive spin.
 
-- **Top-news-style category** (e.g. a section literally called "Top News," "This Week's Headlines," or similar — ask the user if unsure whether a category counts): full treatment, 2–4 neutral, factual sentences. Cover what happened, the companies involved, and why it matters competitively (e.g. what capability it adds, what market it targets, how it compares to adjacent players). Headline is hyperlinked; the summary text itself is plain (not linked).
-- **Every other category**: one sentence, active voice, and the *entire sentence* — not just the company name — is the hyperlink. No separate headline/summary split for these rows.
+Occasionally the real reference combines two closely related stories into one linked paragraph with a line break between them (e.g. two personnel/product items from the same theme) — that's a judgment call for a genuinely tight pairing, not the default. Default to one article per line.
 
-Neutral and factual only — no opinion, no editorializing, no "impressively" / "unfortunately" / competitive spin. State what happened and, if relevant, the stated business reason (e.g. "to expand into the EU e-invoicing market"), not Claude's own read on whether it's good or bad for anyone.
+Separate articles within a section with a blank spacer row (see skeleton below), matching the reference's `<p>&nbsp;</p>` spacer pattern.
 
 ## HTML skeleton
 
@@ -45,56 +49,60 @@ Neutral and factual only — no opinion, no editorializing, no "impressively" / 
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#E3F3EE;">
   <tr>
     <td align="center">
-      <table role="presentation" width="640" cellpadding="0" cellspacing="0" border="0" style="max-width:640px;background-color:#ffffff;font-family:Arial,Helvetica,sans-serif;">
+      <table role="presentation" width="650" cellpadding="0" cellspacing="0" border="0" style="max-width:650px;background-color:#ffffff;font-family:Arial,Helvetica,sans-serif;">
 
-        <!-- Masthead -->
+        <!-- Masthead (title is already baked into the image) -->
         <tr>
-          <td style="position:relative;">
-            <img src="Masthead.png" width="640" alt="" style="display:block;width:100%;max-width:640px;height:auto;border:0;">
+          <td>
+            <img src="Masthead.png" width="650" alt="Corporates Newsletter" style="display:block;width:100%;max-width:650px;height:auto;border:0;">
           </td>
         </tr>
+
+        <!-- Date / confidentiality line -->
         <tr>
-          <td style="padding:18px 24px 4px 24px;background-color:#E3F3EE;">
-            <div style="font-size:24px;font-weight:bold;color:#0F6D63;">Corporates Newsletter</div>
-            <div style="font-size:13px;color:#666666;margin-top:2px;">Week of {{DATE_RANGE}}</div>
+          <td style="padding:10px 24px;">
+            <span style="font-size:13px;color:#7E8C8D;">{{ISSUE_DATE}} &nbsp;|&nbsp; This newsletter is confidential and strictly for internal purposes</span>
           </td>
         </tr>
 
         <!-- ==== Repeat this block per section ==== -->
         <tr>
-          <td style="padding:20px 24px 4px 24px;border-top:3px solid #0F6D63;">
-            <div style="font-size:17px;font-weight:bold;color:#0F6D63;text-transform:uppercase;letter-spacing:0.5px;">{{SECTION_NAME}}</div>
+          <td style="padding:16px 24px 6px 24px;">
+            <div style="font-size:15px;font-weight:bold;color:#123121;">{{SECTION_NAME}}</div>
           </td>
         </tr>
 
-        <!-- Top-news-style article row (full treatment) -->
+        <!-- Repeat per article in this section -->
         <tr>
-          <td style="padding:10px 24px 0 24px;">
-            <a href="{{ARTICLE_URL}}" style="font-size:15px;font-weight:bold;color:#0F6D63;text-decoration:none;">{{HEADLINE}}</a>
-            <div style="font-size:12px;color:#666666;margin:2px 0 6px 0;">{{SOURCE}} &middot; {{DATE}}</div>
-            <div style="font-size:14px;color:#222222;line-height:1.5;">{{2-4 SENTENCE SUMMARY}}</div>
+          <td style="padding:4px 24px 0 24px;">
+            <a href="{{ARTICLE_URL}}" style="font-size:13px;color:#1155CC;text-decoration:none;">{{ONE ACTIVE-VOICE SENTENCE, FULLY LINKED}}</a>
           </td>
         </tr>
-
-        <!-- One-line article row (every other category) -->
-        <tr>
-          <td style="padding:8px 24px 0 24px;">
-            <a href="{{ARTICLE_URL}}" style="font-size:14px;color:#2C6E62;text-decoration:underline;">{{ONE ACTIVE-VOICE SENTENCE, FULLY LINKED}}</a>
-          </td>
-        </tr>
+        <tr><td style="padding:8px 24px 0 24px;">&nbsp;</td></tr>
+        <!-- (repeat the two rows above for each additional article, omit the spacer after the last one) -->
 
         <!-- AI-generated note — one per section, after its last article row -->
         <tr>
-          <td style="padding:8px 24px 18px 24px;">
+          <td style="padding:10px 24px 18px 24px;">
             <div style="font-size:11px;color:#999999;font-style:italic;">All summaries in this section are AI-generated.</div>
           </td>
         </tr>
         <!-- ==== end repeatable section block ==== -->
 
-        <!-- Footer -->
+        <!-- Footer: quick-links image, then a real editable subscribe line, then the logo image -->
         <tr>
           <td>
-            <img src="Footer.png" width="640" alt="" style="display:block;width:100%;max-width:640px;height:auto;border:0;">
+            <img src="FooterTop.png" width="650" alt="" style="display:block;width:100%;max-width:650px;height:auto;border:0;">
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:14px 24px;text-align:center;">
+            <a href="mailto:mci@thomsonreuters.com?subject=Corporates%20Newsletter%3A%20Subscription&body=Hey%2C%20I%20would%20like%20to%20subscribe%20to%20the%20Corporates%20Newsletter.%20Thanks%21" style="color:#7E8C8D;font-size:13px;text-decoration:none;">Click here to subscribe to the Corporates Newsletter</a>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <img src="FooterBottom.png" width="650" alt="" style="display:block;width:100%;max-width:650px;height:auto;border:0;">
           </td>
         </tr>
 
@@ -106,8 +114,8 @@ Neutral and factual only — no opinion, no editorializing, no "impressively" / 
 
 Notes on filling it in:
 
-- `{{DATE_RANGE}}` — the 7-day window this issue covers, e.g. `September 15–22, 2026`.
+- `{{ISSUE_DATE}}` — the day you're sending, e.g. `September 22, 2026` (matches the reference's own date line, not the 7-day scan window).
 - Repeat the section block once per category from the user's Categorize reply, in the order they gave (or ask if they didn't specify an order).
-- Within a section, use the top-news row style only if the section itself is a "top news" style category (see above); otherwise use the one-line row style for every article in it.
+- The subscribe line is real text, not an image — keep it plain grey, no bold, no highlight color. It's meant to look identical to how it reads in `Corporates Newsletter format.html`.
 - Drop the AI-generated note only for a section made entirely of verbatim/user-written text (shouldn't normally happen here).
-- Subject line convention: `Corporates Newsletter: {{Month DD, YYYY}}` — use the issue date (the day you're sending), not the start of the 7-day window.
+- Subject line convention: `Corporates Newsletter - {{Month DD, YYYY}}` (matches the reference issue's own title, which used a dash, not a colon).

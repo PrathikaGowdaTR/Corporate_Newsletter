@@ -16,18 +16,31 @@ Sampled directly from `Masthead.png` and the footer images so the HTML matches t
 | Article link color | `#1155CC` |
 | AI-generated note | `#999999` |
 
-## Images: Masthead.png, FooterTop.png, FooterBottom.png
+## Images: Masthead.png and FooterBottom.png
 
-Three fixed images live at the repository root and don't change week to week:
+Two fixed images live at the repository root and don't change week to week:
 
 - `Masthead.png` — the full masthead, **including the "Corporates Newsletter" title and tagline already baked into the image**. Don't add an HTML title overlay on top of it; that would duplicate the title. Just place the image and move on.
-- `FooterTop.png` / `FooterBottom.png` — the footer's "Quick links and resources" box and the Thomson Reuters logo, split into two images with a gap between them. The gap exists on purpose: the subscribe line goes in that gap as real HTML text (see below), not baked into either image. Don't try to recombine them into one file.
+- `FooterBottom.png` — just the blank gap and the Thomson Reuters logo. Everything else that used to be image-based in the footer (the "Quick links and resources" box, the subscribe line) is now real HTML text — see "Footer content" below.
 
-**Embed all three as base64 `data:` URIs, not as Artifact `files` references.** An `<img src="Masthead.png">` served through the Artifact tool's `files` mechanism resolves to a URL scoped to that private artifact; when the rendered page is pasted into Outlook, Outlook has to fetch that URL to display the image, which can silently fail (no auth, no network path from its renderer) and break the pasted layout even though the artifact preview looked fine. `data:image/png;base64,...` puts the actual pixel bytes inline in the HTML, so nothing needs fetching — it survives copy/paste intact. If Bash/Python is available, base64-encode the three PNGs (e.g. `base64 -w0 Masthead.png`) and substitute the result into the `<img src="data:image/png;base64,...">` slots below; write the fully-substituted HTML to your scratchpad before publishing rather than inlining ~150KB of base64 directly in a tool call. If no script execution is available, fall back to the `files` parameter and flag to the user that pasted images may not survive into Outlook.
+**Embed both as base64 `data:` URIs, not as Artifact `files` references.** An `<img src="Masthead.png">` served through the Artifact tool's `files` mechanism resolves to a URL scoped to that private artifact; when the rendered page is pasted into Outlook, Outlook has to fetch that URL to display the image, which can silently fail (no auth, no network path from its renderer) and break the pasted layout even though the artifact preview looked fine. `data:image/png;base64,...` puts the actual pixel bytes inline in the HTML, so nothing needs fetching — it survives copy/paste intact. If Bash/Python is available, base64-encode the two PNGs (e.g. `base64 -w0 Masthead.png`) and substitute the result into the `<img src="data:image/png;base64,...">` slots below; write the fully-substituted HTML to your scratchpad before publishing rather than inlining ~100KB of base64 directly in a tool call. If no script execution is available, fall back to the `files` parameter and flag to the user that pasted images may not survive into Outlook.
 
 ```html
 <img src="data:image/png;base64,{{MASTHEAD_BASE64}}" width="650" alt="Corporates Newsletter" style="display:block;width:100%;max-width:650px;height:auto;border:0;">
 ```
+
+## Footer content (real HTML, not images)
+
+Fixed values — reuse verbatim every week, don't ask the user to re-supply them:
+
+| Item | Value |
+|---|---|
+| Atrium link | `https://trten.sharepoint.com/sites/intr-market-and-competitive-intelligence/SitePages/Home.aspx?d=w970279f416814a03a74b94ed8525e336&csf=1&web=1&e=UAEdT1&CID=1a8866d7-45f2-4b36-b3af-4bf0da90f584` |
+| Viva Engage link | `https://engage.cloud.microsoft/main/org/tr.com/groups/eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIxMzg3MDU5MTE4MDgifQ/new` |
+| Contact email | `mci@thomsonreuters.com` |
+| Subscribe mailto | `mailto:mci@thomsonreuters.com?subject=Corporates%20Newsletter%3A%20Subscription&body=Hey%2C%20I%20would%20like%20to%20subscribe%20to%20the%20Corporates%20Newsletter.%20Thanks%21` |
+
+The "Quick links and resources" box: light-grey background (`#F5F5F5`), centered bold grey title, then a centered row of three items separated by `|`: Atrium (grey-teal `#46788A`, underlined), Viva Engage (blue `#1155CC`, underlined), and the email (blue `#1155CC`, plain — no underline, as a `mailto:` link). See the skeleton below for the exact markup. The subscribe line right below it is the same plain-grey, no-underline, no-highlight style as before.
 
 ## One section: "Corporate Tax and Trade"
 
@@ -86,12 +99,20 @@ Separate articles with a blank spacer row (see skeleton below), matching the ref
           </td>
         </tr>
 
-        <!-- Footer: quick-links image, then a real editable subscribe line, then the logo image -->
+        <!-- Footer: real "Quick links" box, real subscribe line, then the logo image -->
         <tr>
-          <td>
-            <img src="data:image/png;base64,{{FOOTERTOP_BASE64}}" width="650" alt="" style="display:block;width:100%;max-width:650px;height:auto;border:0;">
+          <td style="background-color:#F5F5F5;padding:18px 24px;text-align:center;">
+            <div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:bold;color:#7E8C8D;">Quick links and resources</div>
+            <div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;margin-top:10px;">
+              <a href="https://trten.sharepoint.com/sites/intr-market-and-competitive-intelligence/SitePages/Home.aspx?d=w970279f416814a03a74b94ed8525e336&csf=1&web=1&e=UAEdT1&CID=1a8866d7-45f2-4b36-b3af-4bf0da90f584" style="color:#46788A;text-decoration:underline;">Atrium</a>
+              <span style="color:#333333;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+              <a href="https://engage.cloud.microsoft/main/org/tr.com/groups/eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIxMzg3MDU5MTE4MDgifQ/new" style="color:#1155CC;text-decoration:underline;">Viva Engage</a>
+              <span style="color:#333333;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+              <a href="mailto:mci@thomsonreuters.com" style="color:#1155CC;text-decoration:none;">mci@thomsonreuters.com</a>
+            </div>
           </td>
         </tr>
+        <tr><td style="border-top:1px solid #DDDDDD;font-size:1px;line-height:1px;">&nbsp;</td></tr>
         <tr>
           <td style="padding:14px 24px;text-align:center;">
             <a href="mailto:mci@thomsonreuters.com?subject=Corporates%20Newsletter%3A%20Subscription&body=Hey%2C%20I%20would%20like%20to%20subscribe%20to%20the%20Corporates%20Newsletter.%20Thanks%21" style="font-family:Arial,Helvetica,sans-serif;color:#7E8C8D;font-size:13px;text-decoration:none;">Click here to subscribe to the Corporates Newsletter</a>
@@ -112,7 +133,7 @@ Separate articles with a blank spacer row (see skeleton below), matching the ref
 Notes on filling it in:
 
 - `{{ISSUE_DATE}}` — the day you're sending, e.g. `September 22, 2026` (matches the reference's own date line, not the 7-day scan window).
-- `{{MASTHEAD_BASE64}}`, `{{FOOTERTOP_BASE64}}`, `{{FOOTERBOTTOM_BASE64}}` — base64 of the three PNGs (see Images section above).
-- The subscribe line is real text, not an image — keep it plain grey, no bold, no highlight color. It's meant to look identical to how it reads in `Corporates Newsletter format.html`.
+- `{{MASTHEAD_BASE64}}`, `{{FOOTERBOTTOM_BASE64}}` — base64 of the two PNGs (see Images section above).
+- The "Quick links" box and subscribe line are real text/links, not images — the fixed URLs are in the table above, reuse them verbatim.
 - Drop the AI-generated note only if every article is verbatim/user-written text (shouldn't normally happen here).
 - Subject line convention: `Corporates Newsletter - {{Month DD, YYYY}}` (matches the reference issue's own title, which used a dash, not a colon).

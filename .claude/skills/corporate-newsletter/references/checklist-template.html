@@ -14,9 +14,12 @@ This file is a template. Each week, copy it to your scratchpad, then:
                                        // final newsletter section, just a way to break up a
                                        // long list on this page
      "headline": "...",               // the article headline, verbatim or lightly trimmed
-     "url": "https://...",            // hyperlink target
-     "source": "Avalara",             // from the Source column of CTT_NL_Sources.csv
-     "date": "Sep 18, 2026",          // publish date as found
+     "url": "https://...",            // hyperlink target — leave "" if unknown (e.g. coming out
+                                       // of a pasted-digest triage with no source yet); the item
+                                       // just renders as plain text with no link, don't guess one
+     "source": "Avalara",             // from the Source column of CTT_NL_Sources.csv, or however
+                                       // the pasted digest identified the company
+     "date": "Sep 18, 2026",          // publish date as found, or "" if the digest gave none
      "tag": ""                        // "" for a normal item. Use a short flag string for
                                        // anything borderline, e.g.:
                                        //   "found via web search — not a direct site scan, verify before use"
@@ -177,8 +180,8 @@ This file is a template. Each week, copy it to your scratchpad, then:
             '<input type="checkbox" data-id="' + it.id + '" class="sel-check">' +
             '<span class="item-num">#' + it.id + '</span>' +
             '<span class="item-body">' +
-              '<div class="item-headline"><a href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.headline) + '</a></div>' +
-              '<div class="item-meta">' + esc(it.source) + ' &middot; ' + esc(it.date) + '</div>' +
+              '<div class="item-headline">' + (it.url ? '<a href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.headline) + '</a>' : esc(it.headline)) + '</div>' +
+              '<div class="item-meta">' + esc(it.source) + (it.date ? ' &middot; ' + esc(it.date) : '') + '</div>' +
               (it.tag ? '<div class="item-tag">' + esc(it.tag) + '</div>' : '') +
             '</span>' +
           '</label>';

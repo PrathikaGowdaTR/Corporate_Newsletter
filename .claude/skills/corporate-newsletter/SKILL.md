@@ -29,7 +29,22 @@ Read `CTT_NL_Sources.csv` with the `Read` tool (plain CSV, no encoding tricks ne
 
 ## Step 2 — Get this week's candidate stories
 
-There are two ways into this step. **2A (pasted digest) is the default** — use it whenever the user pastes news text, and don't run an automated scan alongside it unless they ask for one. Fall back to **2B (automated scan)** only when the user has no digest to paste and wants you to go find stories yourself.
+There are two ways into this step. **2A (pasted digest) is the default** — use it whenever the user pastes news text, and don't run an automated scan alongside it unless they ask for one. Fall back to **2B (automated scan)** only when the user has no digest to paste and wants you to go find stories yourself. **2C (standing aggregator check) always runs, every week, regardless of which of 2A/2B is used** — it's a fixed supplementary check, not an alternative to either.
+
+### Step 2C — Standing aggregator check (always run)
+
+In addition to whatever comes out of 2A or 2B, always check these six aggregator/trade pages every week — they're the `Type = Page` rows from `CTT_NL_Sources.csv` that the user has specifically called out as a standing requirement, not just part of the general source list:
+
+* `https://www.businesswire.com/newsroom?industry=1050097&language=en`
+* `https://www.businesswire.com/newsroom?industry=1000020&language=en`
+* `https://www.vatupdate.com/`
+* `https://www.internationaltaxreview.com/north-america?00000181-3b63-d208-ade1-7fe7b4b60000-page=2`
+* `https://news.bloombergtax.com/daily-tax-report`
+* `https://www.accountingweb.co.uk/latest-news-and-comment`
+
+Try `WebFetch` on each first — don't assume the network block from past runs still holds, it costs nothing to check. As of this writing all six return `EGRESS_BLOCKED`, so in practice this means one `WebSearch` per source (source name + "news" + current month/year, e.g. `"VATupdate newsletter week September 2026 e-invoicing VAT developments"`), applying the same relevance and exclusion rules as everywhere else in Step 2.
+
+Expect a thin yield here and don't burn excess effort chasing it — these are roundup/link-heavy aggregator pages, and `WebSearch`'s recall for a specific dated article buried in one is weak (the same bias problem noted in 2B: generic queries surface recurring recap content — e.g. Bloomberg Tax's annual projected-rates report, EY's recurring international-tax-developments bulletin — much more readily than the one dated, concrete item actually worth including that week). One or two solid items from all six sources combined in a given week is normal, not a sign something's wrong. Tag anything found this way the same as other `WebSearch`-sourced items (`"found via web search — verify before use"`).
 
 ### Step 2A — User-pasted digest (default)
 

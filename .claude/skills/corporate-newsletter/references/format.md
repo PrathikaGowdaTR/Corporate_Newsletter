@@ -107,15 +107,15 @@ Separate articles with a blank spacer row (see skeleton below), matching the ref
             <div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;color:#FFFFFF;">{{SECTION_HEADING}}</div>
           </td>
         </tr>
-        <tr><td style="padding:2px 24px 0 24px;font-size:1px;line-height:1px;">&nbsp;</td></tr>
+        <tr><td style="padding:5px 24px 0 24px;font-size:1px;line-height:1px;">&nbsp;</td></tr>
 
         <!-- Repeat per article within the section -->
         <tr>
-          <td style="padding:2px 24px 0 24px;">
+          <td style="padding:5px 24px 0 24px;">
             <a href="{{ARTICLE_URL}}" style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#1155CC;text-decoration:none;">{{ONE ACTIVE-VOICE SENTENCE, FULLY LINKED}}</a>
           </td>
         </tr>
-        <tr><td style="padding:2px 24px 0 24px;font-size:1px;line-height:1px;">&nbsp;</td></tr>
+        <tr><td style="padding:5px 24px 0 24px;font-size:1px;line-height:1px;">&nbsp;</td></tr>
         <!-- (repeat the two rows above for each additional article in this section, omit the spacer after the last one) -->
 
         <tr><td style="padding:10px 24px 0 24px;font-family:Arial,Helvetica,sans-serif;font-size:13px;">&nbsp;</td></tr>

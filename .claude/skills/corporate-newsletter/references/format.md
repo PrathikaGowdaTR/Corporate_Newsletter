@@ -68,6 +68,8 @@ Occasionally the real reference combines two closely related stories into one li
 
 Separate articles with a blank spacer row (see skeleton below), matching the reference's `<p>&nbsp;</p>` spacer pattern. Set `font-family:Arial,Helvetica,sans-serif` explicitly on every text-carrying tag (`<span>`, `<div>`, `<a>`) rather than relying on it cascading down from the outer table — copy/paste into Outlook doesn't always preserve inherited styles reliably, only ones stated directly on the element.
 
+**The spacer row's cell must use `font-size:1px;line-height:1px`, not the body's 12-13px.** A spacer cell inheriting the normal article font-size renders a ~15-16px-tall line box regardless of the `padding` value, which swamps small padding adjustments (a change from 8px to 2px is invisible against that line-height) — this is exactly the footer's `border-top` separator row technique, reused here. With `font-size:1px;line-height:1px`, the row's height is controlled almost entirely by `padding`, so adjusting the gap between articles actually does something visible.
+
 ## HTML skeleton
 
 ```html
@@ -105,7 +107,7 @@ Separate articles with a blank spacer row (see skeleton below), matching the ref
             <div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;color:#FFFFFF;">{{SECTION_HEADING}}</div>
           </td>
         </tr>
-        <tr><td style="padding:2px 24px 0 24px;font-family:Arial,Helvetica,sans-serif;font-size:13px;">&nbsp;</td></tr>
+        <tr><td style="padding:6px 24px 0 24px;font-size:1px;line-height:1px;">&nbsp;</td></tr>
 
         <!-- Repeat per article within the section -->
         <tr>
@@ -113,7 +115,7 @@ Separate articles with a blank spacer row (see skeleton below), matching the ref
             <a href="{{ARTICLE_URL}}" style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#1155CC;text-decoration:none;">{{ONE ACTIVE-VOICE SENTENCE, FULLY LINKED}}</a>
           </td>
         </tr>
-        <tr><td style="padding:2px 24px 0 24px;font-family:Arial,Helvetica,sans-serif;font-size:13px;">&nbsp;</td></tr>
+        <tr><td style="padding:6px 24px 0 24px;font-size:1px;line-height:1px;">&nbsp;</td></tr>
         <!-- (repeat the two rows above for each additional article in this section, omit the spacer after the last one) -->
 
         <tr><td style="padding:10px 24px 0 24px;font-family:Arial,Helvetica,sans-serif;font-size:13px;">&nbsp;</td></tr>

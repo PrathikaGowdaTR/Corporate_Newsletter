@@ -1,5 +1,7 @@
 # House style — Corporates Newsletter
 
+**Format locked.** Every value below (colors, font sizes, padding, the HTML skeleton) was iterated on and confirmed by the user and is now the standing house style — reuse it exactly, every week, without re-adjusting spacing/sizing/colors on your own judgment. Only change something here if the user explicitly asks for a style change in a given week; if they do, update this file to match immediately after (see `SKILL.md`) so the lock stays current instead of drifting out of sync with what was actually last approved.
+
 This is the HTML skeleton and formatting rules for the weekly Corporates Newsletter. Fill it in during Step 4/5 of `SKILL.md`. It's derived directly from `Corporates Newsletter format.html` at the repository root — a real past issue (exported from the newsletter's actual send platform) — so when in doubt, that file is the ground truth and this document is just a distilled version of it for filling in each week without re-reading 800 lines of markup.
 
 The final artifact gets copied as rendered rich text and pasted into Outlook, so every rule below exists to survive that round-trip: table-based layout, inline styles only, no `<style>` blocks, no flexbox/grid/`position`, no external CSS or JS. Outlook's rendering engine (Word) only reliably honors inline styles on `<table>`/`<td>`/`<font>`-era markup.

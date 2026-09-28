@@ -139,6 +139,8 @@ Use the `title` parameter (e.g. "Corporates Newsletter Draft") and pass `icon` o
 
 Ask for corrections. Loop on their feedback — re-render and re-publish the same artifact URL each time — until they say it's good to go. If they report the pasted result doesn't match the preview, ask specifically what differs (missing images, wrong font, collapsed spacing, lost colors) rather than guessing at another fix blind.
 
+**Style is locked.** `references/format.md` is confirmed house style, not a first draft — every color, font size, and padding value in it was explicitly iterated on and approved. Fill it in as-is every week; don't second-guess or adjust spacing/sizing/colors on your own initiative. If the user asks for a style change during review, make the change, republish, **and** update `references/format.md` to match immediately (same session) so the lock reflects what was actually just approved — a style tweak that isn't written back into the reference file will silently regress the following week.
+
 ## Step 6 — Hand off the final draft
 
 Once approved:

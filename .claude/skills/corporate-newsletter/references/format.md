@@ -102,9 +102,10 @@ Separate articles with a blank spacer row (see skeleton below), matching the ref
         <!-- Omit a section's entire block (heading included) if it has zero selected articles. -->
         <tr>
           <td style="background-color:#4D4D4D;padding:3px 24px;">
-            <div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:bold;color:#FFFFFF;">{{SECTION_HEADING}}</div>
+            <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:bold;color:#FFFFFF;">{{SECTION_HEADING}}</div>
           </td>
         </tr>
+        <tr><td style="padding:8px 24px 0 24px;font-family:Arial,Helvetica,sans-serif;font-size:13px;">&nbsp;</td></tr>
 
         <!-- Repeat per article within the section -->
         <tr>
@@ -152,7 +153,7 @@ Separate articles with a blank spacer row (see skeleton below), matching the ref
 Notes on filling it in:
 
 - `{{ISSUE_DATE}}` — the day you're sending, e.g. `September 22, 2026` (matches the reference's own date line, not the 7-day scan window).
-- `{{SECTION_HEADING}}` — one of the three fixed section names, in order: "Corporate Tax and Trade", "Corporate Legal", "Corporate Risk", rendered as a tight grey band (padding just enough to hug the text) with bold white text at the same 13px size as the article text below it, not larger. Omit a section's whole block if it has no selected articles that week.
+- `{{SECTION_HEADING}}` — one of the three fixed section names, in order: "Corporate Tax and Trade", "Corporate Legal", "Corporate Risk", rendered as a tight grey band (padding just enough to hug the text) with bold white text at 11px (2px smaller than the 13px article text below it), followed by a one-line spacer row before the first article. Omit a section's whole block if it has no selected articles that week.
 - `{{MASTHEAD_BASE64}}`, `{{FOOTERBOTTOM_BASE64}}` — base64 of the two PNGs (see Images section above).
 - The "Quick links" box and subscribe line are real text/links, not images — the fixed URLs are in the table above, reuse them verbatim.
 - The AI-generated disclaimer appears exactly once, right under the date line — not once per section. Drop it only if every article across every section is verbatim/user-written text (shouldn't normally happen here).

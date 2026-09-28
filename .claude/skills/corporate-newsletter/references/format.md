@@ -42,9 +42,15 @@ Fixed values — reuse verbatim every week, don't ask the user to re-supply them
 
 The "Quick links and resources" box: light-grey background (`#F5F5F5`), centered bold grey title, then a centered row of three items separated by `|`: Atrium (grey-teal `#46788A`, underlined), Viva Engage (blue `#1155CC`, underlined), and the email (blue `#1155CC`, plain — no underline, as a `mailto:` link). See the skeleton below for the exact markup. The subscribe line right below it is the same plain-grey, no-underline, no-highlight style as before.
 
-## One section: "Corporate Tax and Trade"
+## Three sections, always in this order
 
-This newsletter doesn't categorize — there is exactly one section, always named **"Corporate Tax and Trade"**, and every selected article goes under it in the order the user gave. Don't ask the user to categorize, don't invent additional sections, and don't split into multiple sections even if the articles cover different sub-topics (tax, legal, risk, etc.) — they all still go under the one section header.
+The newsletter has exactly three sections, always in this fixed order:
+
+1. **Corporate Tax and Trade**
+2. **Corporate Legal**
+3. **Corporate Risk**
+
+Every selected article goes under whichever section it was already assigned to at the Step 3 checklist stage, in the order the user gave within that section — don't re-categorize at this point. Each section repeats the same block structure (heading, articles, "AI-generated" note) — see the skeleton below. If a section has no selected articles for the week, omit that section's entire block (heading included) rather than printing an empty heading.
 
 ## Article format is uniform
 
@@ -76,28 +82,31 @@ Separate articles with a blank spacer row (see skeleton below), matching the ref
           </td>
         </tr>
 
-        <!-- The one section: always "Corporate Tax and Trade" -->
+        <!-- Section block — repeat this whole block once per section that has selected articles, -->
+        <!-- always in the fixed order: Corporate Tax and Trade, Corporate Legal, Corporate Risk. -->
+        <!-- Omit a section's entire block (heading included) if it has zero selected articles. -->
         <tr>
           <td style="padding:16px 24px 6px 24px;">
-            <div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;color:#123121;">Corporate Tax and Trade</div>
+            <div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;color:#123121;">{{SECTION_HEADING}}</div>
           </td>
         </tr>
 
-        <!-- Repeat per article -->
+        <!-- Repeat per article within the section -->
         <tr>
           <td style="padding:4px 24px 0 24px;">
             <a href="{{ARTICLE_URL}}" style="font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#1155CC;text-decoration:none;">{{ONE ACTIVE-VOICE SENTENCE, FULLY LINKED}}</a>
           </td>
         </tr>
         <tr><td style="padding:8px 24px 0 24px;font-family:Arial,Helvetica,sans-serif;font-size:13px;">&nbsp;</td></tr>
-        <!-- (repeat the two rows above for each additional article, omit the spacer after the last one) -->
+        <!-- (repeat the two rows above for each additional article in this section, omit the spacer after the last one) -->
 
-        <!-- AI-generated note -->
+        <!-- AI-generated note, once per section -->
         <tr>
           <td style="padding:10px 24px 18px 24px;">
             <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#999999;font-style:italic;">All summaries in this section are AI-generated.</div>
           </td>
         </tr>
+        <!-- (repeat the whole section block above for the next section, in fixed order) -->
 
         <!-- Footer: real "Quick links" box, real subscribe line, then the logo image -->
         <tr>
@@ -133,6 +142,7 @@ Separate articles with a blank spacer row (see skeleton below), matching the ref
 Notes on filling it in:
 
 - `{{ISSUE_DATE}}` — the day you're sending, e.g. `September 22, 2026` (matches the reference's own date line, not the 7-day scan window).
+- `{{SECTION_HEADING}}` — one of the three fixed section names, in order: "Corporate Tax and Trade", "Corporate Legal", "Corporate Risk". Omit a section's whole block if it has no selected articles that week.
 - `{{MASTHEAD_BASE64}}`, `{{FOOTERBOTTOM_BASE64}}` — base64 of the two PNGs (see Images section above).
 - The "Quick links" box and subscribe line are real text/links, not images — the fixed URLs are in the table above, reuse them verbatim.
 - Drop the AI-generated note only if every article is verbatim/user-written text (shouldn't normally happen here).

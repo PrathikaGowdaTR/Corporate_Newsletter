@@ -11,7 +11,9 @@ Sampled directly from `Masthead.png` and the footer images so the HTML matches t
 | Use | Hex |
 |---|---|
 | Masthead / page background (light mint) | `#E3F3EE` |
-| Dark green (masthead top bar, section headers) | `#123121` |
+| Dark green (masthead top bar) | `#123121` |
+| Section heading band background | `#4D4D4D` |
+| Section heading text | `#FFFFFF` |
 | Muted grey (date line, footer subscribe line) | `#7E8C8D` |
 | Article link color | `#1155CC` |
 | AI-generated note | `#999999` |
@@ -50,7 +52,13 @@ The newsletter has exactly three sections, always in this fixed order:
 2. **Corporate Legal**
 3. **Corporate Risk**
 
-Every selected article goes under whichever section it was already assigned to at the Step 3 checklist stage, in the order the user gave within that section — don't re-categorize at this point. Each section repeats the same block structure (heading, articles, "AI-generated" note) — see the skeleton below. If a section has no selected articles for the week, omit that section's entire block (heading included) rather than printing an empty heading.
+Every selected article goes under whichever section it was already assigned to at the Step 3 checklist stage, in the order the user gave within that section — don't re-categorize at this point. Each section repeats the same block structure (heading band, then articles) — see the skeleton below. If a section has no selected articles for the week, omit that section's entire block (heading included) rather than printing an empty heading.
+
+Each section heading is its own full-width band: grey background (`#4D4D4D`), bold white text, left-padded to match the rest of the layout — not a plain text line like before. See the skeleton below for the exact markup.
+
+## AI-generated disclaimer: once, at the top
+
+Unlike the per-section note used previously, there is now exactly **one** "All summaries in this newsletter are AI-generated." line, placed once as its own line directly under the date/confidentiality line — before the first section heading, not repeated after each section.
 
 ## Article format is uniform
 
@@ -82,12 +90,19 @@ Separate articles with a blank spacer row (see skeleton below), matching the ref
           </td>
         </tr>
 
+        <!-- AI-generated disclaimer: once, right after the date line, not repeated per section -->
+        <tr>
+          <td style="padding:0 24px 10px 24px;">
+            <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#999999;font-style:italic;">All summaries in this newsletter are AI-generated.</div>
+          </td>
+        </tr>
+
         <!-- Section block — repeat this whole block once per section that has selected articles, -->
         <!-- always in the fixed order: Corporate Tax and Trade, Corporate Legal, Corporate Risk. -->
         <!-- Omit a section's entire block (heading included) if it has zero selected articles. -->
         <tr>
-          <td style="padding:16px 24px 6px 24px;">
-            <div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;color:#123121;">{{SECTION_HEADING}}</div>
+          <td style="background-color:#4D4D4D;padding:10px 24px;">
+            <div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;color:#FFFFFF;">{{SECTION_HEADING}}</div>
           </td>
         </tr>
 
@@ -100,13 +115,8 @@ Separate articles with a blank spacer row (see skeleton below), matching the ref
         <tr><td style="padding:8px 24px 0 24px;font-family:Arial,Helvetica,sans-serif;font-size:13px;">&nbsp;</td></tr>
         <!-- (repeat the two rows above for each additional article in this section, omit the spacer after the last one) -->
 
-        <!-- AI-generated note, once per section -->
-        <tr>
-          <td style="padding:10px 24px 18px 24px;">
-            <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#999999;font-style:italic;">All summaries in this section are AI-generated.</div>
-          </td>
-        </tr>
-        <!-- (repeat the whole section block above for the next section, in fixed order) -->
+        <tr><td style="padding:10px 24px 0 24px;font-family:Arial,Helvetica,sans-serif;font-size:13px;">&nbsp;</td></tr>
+        <!-- (repeat the whole section block above for the next section, in fixed order — no per-section note anymore) -->
 
         <!-- Footer: real "Quick links" box, real subscribe line, then the logo image -->
         <tr>
@@ -142,8 +152,8 @@ Separate articles with a blank spacer row (see skeleton below), matching the ref
 Notes on filling it in:
 
 - `{{ISSUE_DATE}}` — the day you're sending, e.g. `September 22, 2026` (matches the reference's own date line, not the 7-day scan window).
-- `{{SECTION_HEADING}}` — one of the three fixed section names, in order: "Corporate Tax and Trade", "Corporate Legal", "Corporate Risk". Omit a section's whole block if it has no selected articles that week.
+- `{{SECTION_HEADING}}` — one of the three fixed section names, in order: "Corporate Tax and Trade", "Corporate Legal", "Corporate Risk", rendered as a grey band with white bold text. Omit a section's whole block if it has no selected articles that week.
 - `{{MASTHEAD_BASE64}}`, `{{FOOTERBOTTOM_BASE64}}` — base64 of the two PNGs (see Images section above).
 - The "Quick links" box and subscribe line are real text/links, not images — the fixed URLs are in the table above, reuse them verbatim.
-- Drop the AI-generated note only if every article is verbatim/user-written text (shouldn't normally happen here).
+- The AI-generated disclaimer appears exactly once, right under the date line — not once per section. Drop it only if every article across every section is verbatim/user-written text (shouldn't normally happen here).
 - Subject line convention: `Corporates Newsletter - {{Month DD, YYYY}}` (matches the reference issue's own title, which used a dash, not a colon).

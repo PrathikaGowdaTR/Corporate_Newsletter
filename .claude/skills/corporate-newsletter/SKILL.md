@@ -123,9 +123,9 @@ No further categorization step here — whatever numbers the user gives you (e.g
 
 Write a neutral, factual summary for each article — no opinion, no editorializing, just what happened and why it matters competitively. Format is uniform (see `references/format.md`): one active-voice sentence per article, with the whole thing hyperlinked — no separate headline/summary split, no section gets a longer paragraph treatment than any other.
 
-Each section gets its own italic line "All summaries in this section are AI-generated" at the end of that section (only omit it for a given section if every article in it is verbatim/user-written text, which shouldn't normally happen here).
+The newsletter gets a single italic line "All summaries in this newsletter are AI-generated" once, directly under the date/confidentiality line — not repeated per section (only omit it entirely if every article across every section is verbatim/user-written text, which shouldn't normally happen here). Each section heading itself renders as a full-width grey band (`#4D4D4D` background, bold white text) — see `references/format.md`.
 
-Fill in the HTML skeleton from `references/format.md` — masthead first (fixed content, only the date line changes), then the three sections **in order** (Corporate Tax and Trade, Corporate Legal, Corporate Risk — even if one has no selected articles this week, see below), then the footer. Also draft a subject line: `Corporates Newsletter - <Month DD, YYYY>` (matches the real reference issue's own title style).
+Fill in the HTML skeleton from `references/format.md` — masthead first (fixed content, only the date line changes), then the single AI-generated disclaimer line, then the three sections **in order** (Corporate Tax and Trade, Corporate Legal, Corporate Risk — even if one has no selected articles this week, see below), then the footer. Also draft a subject line: `Corporates Newsletter - <Month DD, YYYY>` (matches the real reference issue's own title style).
 
 If a section has zero selected articles for the week (expected for Corporate Legal/Corporate Risk until their sources are configured, or any section on a genuinely thin week), skip rendering that section's block entirely rather than showing an empty heading — don't invent filler to keep all three visible.
 

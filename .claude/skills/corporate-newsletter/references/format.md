@@ -101,7 +101,7 @@ Separate articles with a blank spacer row (see skeleton below), matching the ref
         <!-- always in the fixed order: Corporate Tax and Trade, Corporate Legal, Corporate Risk. -->
         <!-- Omit a section's entire block (heading included) if it has zero selected articles. -->
         <tr>
-          <td style="background-color:#4D4D4D;padding:10px 24px;">
+          <td style="background-color:#4D4D4D;padding:5px 24px;">
             <div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;color:#FFFFFF;">{{SECTION_HEADING}}</div>
           </td>
         </tr>

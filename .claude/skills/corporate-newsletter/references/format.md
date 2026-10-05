@@ -66,6 +66,8 @@ Unlike the per-section note used previously, there is now exactly **one** "All s
 
 Every article uses the same format: one fully neutral, factual sentence, active voice, and the *entire sentence* (not just the company name) is the hyperlink. Cover what happened and, if relevant, the stated business reason (e.g. "to expand into the EU e-invoicing market") — no separate headline/summary split, no opinion, no editorializing, no "impressively" / "unfortunately" / competitive spin.
 
+**No trailing full stop.** The sentence does not end in a period — drop it, same as a headline.
+
 Occasionally the real reference combines two closely related stories into one linked paragraph with a line break between them (e.g. two personnel/product items from the same theme) — that's a judgment call for a genuinely tight pairing, not the default. Default to one article per line.
 
 Separate articles with a blank spacer row (see skeleton below), matching the reference's `<p>&nbsp;</p>` spacer pattern. Set `font-family:Arial,Helvetica,sans-serif` explicitly on every text-carrying tag (`<span>`, `<div>`, `<a>`) rather than relying on it cascading down from the outer table — copy/paste into Outlook doesn't always preserve inherited styles reliably, only ones stated directly on the element.

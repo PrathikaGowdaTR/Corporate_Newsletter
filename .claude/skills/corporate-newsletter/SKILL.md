@@ -41,13 +41,15 @@ Some sources may be permanently unreachable in this environment (network/policy-
 
 ## Step 1 — Read the source list
 
-Read `CTT_NL_Sources.csv` with the `Read` tool (plain CSV, no encoding tricks needed). Reconstruct the full `(source, type, link)` list. Needed for Step 2B only — skip this if the user is pasting a digest (Step 2A) and hasn't asked for a supplementary scan.
+Read `CTT_NL_Sources.csv` with the `Read` tool (plain CSV, no encoding tricks needed). Reconstruct the full `(source, type, link)` list. Needed every week for Step 2B — not a conditional step, since 2B itself now always runs (see Step 2).
 
 ## Step 2 — Get this week's candidate stories (Corporate Tax and Trade only)
 
 This step applies **only to Corporate Tax and Trade** — Corporate Legal and Corporate Risk are never sourced or triaged by this skill (see "Three sections" above); when the user hands those over, skip straight to Step 4's light verification pass for them.
 
-There are two ways into this step. **2A (pasted digest) is the default** — use it whenever the user pastes news text, and don't run an automated scan alongside it unless they ask for one. Fall back to **2B (automated scan)** only when the user has no digest to paste and wants you to go find stories yourself. **2C (standing aggregator check) always runs, every week** — it's a fixed supplementary check, not an alternative to either.
+**All three run every week, regardless of whether the user pastes a digest — none of them is a fallback for the others.** This changed from an earlier version of this skill where 2B only ran if the user had nothing to paste; that's no longer correct. The required order is: **2B first** (independently scan the source list and build a candidate list with no knowledge yet of what the user is about to paste), **then 2A** (triage whatever digest the user sends), **then reconcile the two lists** — call out stories 2B found that aren't in the user's digest, and don't silently drop either side. **2C** (the six standing aggregators) always runs too, feeding into the same combined list.
+
+Doing 2A first and only "falling back" to 2B when convenient defeats the point: 2B is the independent check that catches what the user's own digest missed, so it has to run *before* seeing the digest, not be skipped because a digest already arrived.
 
 ### Step 2C — Standing aggregator check (always run)
 
@@ -64,21 +66,15 @@ Try `WebFetch` on each first — don't assume the network block from past runs s
 
 Expect a thin yield here and don't burn excess effort chasing it — these are roundup/link-heavy aggregator pages, and `WebSearch`'s recall for a specific dated article buried in one is weak (the same bias problem noted in 2B: generic queries surface recurring recap content — e.g. Bloomberg Tax's annual projected-rates report, EY's recurring international-tax-developments bulletin — much more readily than the one dated, concrete item actually worth including that week). One or two solid items from all six sources combined in a given week is normal, not a sign something's wrong. Tag anything found this way the same as other `WebSearch`-sourced items (`"found via web search — verify before use"`).
 
-### Step 2A — User-pasted digest (default)
-
-The user pastes raw news text for **Corporate Tax and Trade** — company name as a heading, bullets or freeform text underneath, in whatever form they already have it (no need to ask them to restructure it). If a pasted digest clearly contains Corporate Legal or Corporate Risk material mixed in (rather than arriving as the user's own ready-made headline+URL list for those sections), triage only the Tax and Trade portion here and treat any Legal/Risk-shaped bullets as out of scope for this step — say so rather than silently triaging them, since those two sections' content is expected to come from the user pre-selected, not via this digest-triage path. For this path:
-
-* **Don't fetch or verify anything at this stage.** No `WebFetch`, `WebSearch`, or `CTT_NL_Sources.csv` lookups — this is pure text triage against what they gave you. Verification happens later, in Step 4, and only for the items they actually select.
-* Read through every company's bullets and apply the same relevance and exclusion rules as Step 2B point 3 below (concrete company actions in scope vs. the standing exclusions) — the rules are the same regardless of how the raw material arrived. The in-scope definition is `CTT_NL_Database.csv`-calibrated (see Inputs).
-* Split compound bullets into separate candidate items where a single bullet actually describes multiple distinct stories (e.g. two unrelated product updates run together in one sentence); don't force genuinely separate stories into one line just because the source text did.
-* If a whole company's block is clearly off-topic or mismatched (e.g. content that's about a same-named but unrelated thing — a trade-compliance vendor's block that's actually full of unrelated automotive-safety-feature news, a company block that's pure macroeconomic/energy research with no tie to the newsletter's competitive scope), skip the whole block and say so in your chat message rather than force-fitting a few items out of it.
-* Items at this stage won't have a working source URL (the pasted text usually doesn't include one) — that's expected and fine. Don't fabricate one. Leave the checklist item without a link and note once, prominently, that links get located after selection (Step 4), not before.
-
-### Step 2B — Automated scan (fallback, only if asked)
+### Step 2B — Independent source scan (always run, before looking at the user's digest)
 
 Today's date matters here — check it (a system reminder usually states it; otherwise ask or infer from context) and compute the 7-day cutoff before you start.
 
-For each link in `CTT_NL_Sources.csv`:
+Do this **before** triaging whatever the user pastes (Step 2A), not after — the whole point is an independent list to reconcile against, not a scan shaped by already knowing what the user picked.
+
+**Skip every `Type = Link` row (the LinkedIn feeds) for this scan** — only `Press` and `Page` rows get scanned here (that's 70 of the 106 rows as of the Oct 2026 refresh). LinkedIn feeds aren't part of this independent check.
+
+For each remaining link in `CTT_NL_Sources.csv`:
 
 1. Try `WebFetch` first, asking it directly for news items published in the last 7 days with their headline, one-line description, and publish date. Give it the actual cutoff date so it doesn't have to guess "recent."
 2. If `WebFetch` comes back empty, blocked, or clearly wrong (e.g. a JS-rendered site that returns no article text), fall back to the Browser tool: `navigate` to the URL, then `get_page_text` (or `read_page` if the text extraction misses the article list), and read dates/headlines yourself from what comes back.
@@ -93,7 +89,24 @@ For each link in `CTT_NL_Sources.csv`:
    * Still note the underlying fetch failure as "couldn't scan directly: <reason>" in your chat message so the user knows this source needed the fallback, even when the WebSearch step turns up nothing.
    * **Watch for a bias in what surfaces**: a generic query like "`<company>` news September 2026" tends to over-return analyst-recognition placements and press-release-syndicated funding/M&A news (these get picked up widely and rank well), while under-returning the smaller, more numerous partnership/integration/product-enhancement stories that actually make up most of `CTT_NL_Database.csv`. Don't stop at the first page of generic results and conclude a source had little news — try a second, more specific query per company (e.g. add "partners with" / "integrates" / "launches" / "expands to") before moving on, especially if the generic query only turned up recognition/award-type results (which don't count anyway, per the exclusion above).
 
-Scanning ~105 sources takes a while. Give the user a brief progress note if it's taking more than a few dozen sources (e.g. "scanned 30/105 so far, X items found") rather than going silent for the whole step.
+Scanning ~70 sources (the non-`Link` rows) takes a while. Give the user a brief progress note if it's taking more than a few dozen sources (e.g. "scanned 30/70 so far, X items found") rather than going silent for the whole step.
+
+### Step 2A — Triage the user's pasted digest, then reconcile against 2B
+
+Only after the 2B scan above is done. Whatever the user pastes this week (a digest, a list of headlines, links, or loose notes) gets triaged here — not sourced or verified yet, just sorted into candidates:
+
+* Don't fetch or verify anything at this stage — that happens later, in Step 4, only for items the user actually selects off the Step 3 shortlist. Triaging the digest is just reading what's there and deciding what's a plausible candidate.
+* Apply the same relevance rules as Step 2B point 3 (company-channel items vs. aggregator/trade items, the standing exclusions for analyst recognition/awards/event-hosting announcements) — a story that wouldn't survive a direct source scan doesn't get a pass just because the user's digest happened to include it; flag it rather than silently dropping it, same as elsewhere.
+* Split compound bullets — if one line in the digest bundles two unrelated company actions together, list them as two separate candidates, not one.
+* Skip whole off-topic blocks (e.g. a section of the digest that's clearly about something outside Corporate Tax and Trade's scope) rather than forcing unrelated items onto the list; note what was skipped as a plain-text line for the user, don't just silently drop it with no record.
+* It's fine for an item to have no `url` yet at this stage — leave it empty rather than guessing one. Don't burn time trying to track down a source for every digest item before the user has even picked; that only happens in Step 4 for what they select.
+
+**Reconcile the 2A list against the 2B list before building the Step 3 checklist.** This is the step the independent scan exists for — it's not two separate piles that both happen to feed the checklist, it's a deliberate comparison:
+
+* Walk through the 2B list and check which items also appear (same company, same underlying action) in what the user pasted. Anything 2B found that the user's digest did **not** include is exactly the kind of gap this process is meant to catch — keep it on the combined list and call it out explicitly to the user as "found independently, not in your digest" rather than letting it blend in anonymously.
+* Walk through the 2A list the same way in reverse — items the user included that 2B's scan didn't independently surface aren't a problem (2B's recall is imperfect, especially for sources that needed a `WebSearch` fallback), but note internally which ones overlapped and which didn't so the comparison is traceable if the user asks about it.
+* Merge the two into one combined candidate list for Step 3 — don't present them as two separate checklists. Duplicate mentions of the same story (found both independently and in the digest) collapse into a single item.
+* If 2B turned up nothing at all for a source that the user's digest drew heavily from, or vice versa, mention that imbalance briefly in your chat message — it's useful signal about which channel is catching what.
 
 ## Step 3 — Shortlist and hand off to the user (checkpoint 1)
 

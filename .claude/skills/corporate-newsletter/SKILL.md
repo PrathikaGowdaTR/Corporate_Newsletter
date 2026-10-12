@@ -1,6 +1,6 @@
 ---
 name: corporate-newsletter
-description: "Builds the weekly Corporates competitive newsletter (tax compliance, e-invoicing/AP-AR automation, corporate legal, risk & fraud, ESG, and trade/supply-chain competitors) with the user, stopping at two points for their input: picking which articles go in, and reviewing the finished draft. Three sections — Corporate Tax and Trade, Corporate Legal, Corporate Risk — each sourced and shortlisted independently. Nothing gets sent automatically — the deliverable is a ready-to-paste HTML block, because this environment has no email-sending or Outlook-automation tool available."
+description: "Builds the weekly Corporates competitive newsletter (tax compliance, e-invoicing/AP-AR automation, corporate legal, risk & fraud, ESG, and trade/supply-chain competitors) with the user, stopping at two points for their input: picking which articles go in, and reviewing the finished draft. Three sections — Corporate Tax and Trade (sourced and shortlisted by this skill), Corporate Legal and Corporate Risk (always supplied ready-made by the user, never sourced by Claude). Nothing gets sent automatically — the deliverable is a ready-to-paste HTML block, because this environment has no email-sending or Outlook-automation tool available."
 ---
 
 # Corporates newsletter workflow
@@ -11,15 +11,15 @@ Builds the weekly Corporates competitive-intelligence newsletter ("Corporates Ne
 
 This runs every **Monday**. Each issue covers stories from the prior Monday up to and including **last Monday** (a rolling 7-day window that closes on the Monday before send day) — not "the last 7 days from today" if today isn't the send day. When computing any date cutoff (Step 2B/2C), anchor it to that Monday-to-Monday window, not to whatever day the work happens to get done.
 
-## Three sections, each sourced independently
+## Three sections — only one of them is sourced by this skill
 
 The newsletter has three sections, always in this order:
 
-1. **Corporate Tax and Trade** — tax compliance, e-invoicing, AP/AR automation, trade compliance/supply chain. The original section; fully built out below (6 standing aggregator sources, `CTT_NL_Sources.csv`, `CTT_NL_Database.csv`).
-2. **Corporate Legal** — corporate legal tech, contract lifecycle management, legal-ops software. Heading text and standing source link(s) to come from the user — not yet configured. Until supplied, treat this section the same as Corporate Tax and Trade structurally (same relevance/exclusion rules, same pasted-digest-first workflow) but with its own source list once given.
-3. **Corporate Risk** — risk, fraud, AML/KYC, compliance-risk software. Heading text and standing source link(s) to come from the user — not yet configured. Same treatment as Corporate Legal above until the user supplies its sources.
+1. **Corporate Tax and Trade** — tax compliance, e-invoicing, AP/AR automation, trade compliance/supply chain. The only section this skill actively sources and shortlists (6 standing aggregator sources, `CTT_NL_Sources.csv`, `CTT_NL_Database.csv`, Steps 2–3 below).
+2. **Corporate Legal** — corporate legal tech, contract lifecycle management, legal-ops software. **Always supplied ready-made by the user** — a list of headline + URL pairs, already selected and already on-topic. Never run Step 2 (sourcing/triage) or Step 3 (the shortlist checklist) for this section: there is nothing to scan, search, or shortlist here, by standing instruction.
+3. **Corporate Risk** — risk, fraud, AML/KYC, compliance-risk software. Same standing instruction as Corporate Legal: **always supplied ready-made by the user**, never sourced or triaged by this skill.
 
-Each section is sourced, shortlisted, verified, and formatted **independently** — a story about a legal-tech vendor goes in Corporate Legal, not Corporate Tax and Trade, even if it surfaces from the same digest or scan. Don't merge sections' candidate lists into one undifferentiated shortlist; keep the section each item belongs to visible all the way through (Step 2 → Step 3 checklist → Step 4 final placement). The final newsletter still has just these three sections — no further categorization within a section.
+Concretely, this means: Steps 1–3 (reading the source list, scanning/triaging for candidates, building the Step 3 checklist) apply to **Corporate Tax and Trade only**. When the user hands over Corporate Legal and/or Corporate Risk items, skip straight to the light verification pass in Step 4 for those — don't run them through 2A/2B/2C triage, and don't put them on the Step 3 checklist alongside Tax and Trade candidates (that checklist is Tax-and-Trade-only now). The final newsletter still has all three sections in the fixed order above; only how each section's content *arrives* differs.
 
 No shell/script execution in this environment. PowerShell is blocked by enterprise policy, so every step below must use `Read`, `Grep`, `Glob`, `WebFetch`, `WebSearch`, and the Browser tools (`mcp__Claude_Browser__*`) — never a Python/Node/Bash script, and never assume one can run. That is also why the source list and archive are kept as plain `.csv` twins of the `.xlsx` originals (see Inputs) — `Read`/`Grep` can parse CSV directly, but not the binary `.xlsx` format or the hyperlinks buried inside its cells.
 
@@ -27,7 +27,7 @@ Some sources may be permanently unreachable in this environment (network/policy-
 
 ## Inputs
 
-* **Section sources** — `CTT_NL_Sources.csv` and the Step 2C standing aggregator list below are **Corporate Tax and Trade's** sources only. Corporate Legal and Corporate Risk each need their own source list/standing link(s), which the user is providing separately — until they do, there's no automated-scan fallback (2B/2C) available for those two sections, so lean on the user's pasted digest (2A) for them and say so if asked to scan a source that doesn't exist yet for that section.
+* **Section sources** — `CTT_NL_Sources.csv` and the Step 2C standing aggregator list below are **Corporate Tax and Trade's** sources only, and the only section this skill sources at all. Corporate Legal and Corporate Risk are never scanned, searched, or triaged by this skill (no 2A/2B/2C for them) — the user always supplies those two sections' items ready-made (headline + URL pairs already selected). Don't go looking for Legal/Risk sources or offer to scan for them; if asked, point back to this standing instruction.
 * **Source list**: `CTT_NL_Sources.csv` at the repository root by default (columns: `Source, Type, Link`). `Type` is `Press` (the company's own newsroom/press page), `Page` (a third-party aggregator/trade page), or `Link` (a company's own LinkedIn feed) — treat `Press` and `Link` as the company's own channel and `Page` as a trade/aggregator source when applying the relevance rules in Step 2. If the user names a different file or path when invoking this skill, use that instead.
   * `CTT_NL_Sources.xlsx` is the master file the source list is generated from — it stores each link as a hyperlink on a generic cell label (`Press`/`Page`/`Link`), which is exactly the kind of thing `Read` can't extract from a binary spreadsheet without running code. If the user says they've updated the `.xlsx`, regenerate `CTT_NL_Sources.csv` from it (ask the user to re-export it, or use the `xlsx` skill/Excel "Save As CSV" if available) rather than trying to parse the `.xlsx` directly.
 * **House style reference**: `references/format.md` in this skill folder. Read it before Step 4 (summarizing/formatting) — it has the HTML skeleton to fill in, plus the masthead/footer image handling.
@@ -42,15 +42,15 @@ Some sources may be permanently unreachable in this environment (network/policy-
 
 Read `CTT_NL_Sources.csv` with the `Read` tool (plain CSV, no encoding tricks needed). Reconstruct the full `(source, type, link)` list. Needed for Step 2B only — skip this if the user is pasting a digest (Step 2A) and hasn't asked for a supplementary scan.
 
-## Step 2 — Get this week's candidate stories
+## Step 2 — Get this week's candidate stories (Corporate Tax and Trade only)
 
-Run this step **once per section** (Corporate Tax and Trade, Corporate Legal, Corporate Risk) — a story only ever belongs to one section, so keep each section's candidates separate rather than triaging everything into one pile and sorting later.
+This step applies **only to Corporate Tax and Trade** — Corporate Legal and Corporate Risk are never sourced or triaged by this skill (see "Three sections" above); when the user hands those over, skip straight to Step 4's light verification pass for them.
 
-There are two ways into this step. **2A (pasted digest) is the default** — use it whenever the user pastes news text for a section, and don't run an automated scan alongside it unless they ask for one. Fall back to **2B (automated scan)** only when the user has no digest to paste for that section and wants you to go find stories yourself — currently only possible for Corporate Tax and Trade, since that's the only section with a configured source list (see Inputs). **2C (standing aggregator check) always runs, every week, for whichever sections have standing sources configured** — it's a fixed supplementary check, not an alternative to either.
+There are two ways into this step. **2A (pasted digest) is the default** — use it whenever the user pastes news text, and don't run an automated scan alongside it unless they ask for one. Fall back to **2B (automated scan)** only when the user has no digest to paste and wants you to go find stories yourself. **2C (standing aggregator check) always runs, every week** — it's a fixed supplementary check, not an alternative to either.
 
-### Step 2C — Standing aggregator check (always run per configured section)
+### Step 2C — Standing aggregator check (always run)
 
-In addition to whatever comes out of 2A or 2B, always check each section's standing aggregator/trade pages every week. **Corporate Tax and Trade** has six, listed below (they're the `Type = Page` rows from `CTT_NL_Sources.csv` that the user has specifically called out as a standing requirement, not just part of the general source list). **Corporate Legal** and **Corporate Risk** don't have any configured yet — skip 2C for those sections until the user supplies their standing link(s), and don't substitute the Tax and Trade sources for them.
+In addition to whatever comes out of 2A or 2B, always check Corporate Tax and Trade's six standing aggregator/trade pages every week (the `Type = Page` rows from `CTT_NL_Sources.csv` that the user has specifically called out as a standing requirement, not just part of the general source list).
 
 * `https://www.businesswire.com/newsroom?industry=1050097&language=en`
 * `https://www.businesswire.com/newsroom?industry=1000020&language=en`
@@ -65,10 +65,10 @@ Expect a thin yield here and don't burn excess effort chasing it — these are r
 
 ### Step 2A — User-pasted digest (default)
 
-The user pastes raw news text — company name as a heading, bullets or freeform text underneath, in whatever form they already have it (no need to ask them to restructure it). They may paste one section's digest at a time (telling you which section it's for) or a mixed digest covering more than one section — either way, tag every candidate item with its correct section (Corporate Tax and Trade / Corporate Legal / Corporate Risk) based on its actual subject matter, not on which digest it happened to arrive in. For this path:
+The user pastes raw news text for **Corporate Tax and Trade** — company name as a heading, bullets or freeform text underneath, in whatever form they already have it (no need to ask them to restructure it). If a pasted digest clearly contains Corporate Legal or Corporate Risk material mixed in (rather than arriving as the user's own ready-made headline+URL list for those sections), triage only the Tax and Trade portion here and treat any Legal/Risk-shaped bullets as out of scope for this step — say so rather than silently triaging them, since those two sections' content is expected to come from the user pre-selected, not via this digest-triage path. For this path:
 
 * **Don't fetch or verify anything at this stage.** No `WebFetch`, `WebSearch`, or `CTT_NL_Sources.csv` lookups — this is pure text triage against what they gave you. Verification happens later, in Step 4, and only for the items they actually select.
-* Read through every company's bullets and apply the same relevance and exclusion rules as Step 2B point 3 below (concrete company actions in scope vs. the standing exclusions) — the rules are the same regardless of how the raw material arrived. Corporate Tax and Trade's in-scope definition is `CTT_NL_Database.csv`-calibrated (see Inputs); until the user gives equivalent guidance for Corporate Legal and Corporate Risk, use plain judgment on-topic-ness for those two (legal-tech/contract-lifecycle for Corporate Legal; risk/fraud/AML/KYC/compliance-risk for Corporate Risk) and flag genuinely borderline calls rather than silently deciding.
+* Read through every company's bullets and apply the same relevance and exclusion rules as Step 2B point 3 below (concrete company actions in scope vs. the standing exclusions) — the rules are the same regardless of how the raw material arrived. The in-scope definition is `CTT_NL_Database.csv`-calibrated (see Inputs).
 * Split compound bullets into separate candidate items where a single bullet actually describes multiple distinct stories (e.g. two unrelated product updates run together in one sentence); don't force genuinely separate stories into one line just because the source text did.
 * If a whole company's block is clearly off-topic or mismatched (e.g. content that's about a same-named but unrelated thing — a trade-compliance vendor's block that's actually full of unrelated automotive-safety-feature news, a company block that's pure macroeconomic/energy research with no tie to the newsletter's competitive scope), skip the whole block and say so in your chat message rather than force-fitting a few items out of it.
 * Items at this stage won't have a working source URL (the pasted text usually doesn't include one) — that's expected and fine. Don't fabricate one. Leave the checklist item without a link and note once, prominently, that links get located after selection (Step 4), not before.
@@ -96,9 +96,9 @@ Scanning ~105 sources takes a while. Give the user a brief progress note if it's
 
 ## Step 3 — Shortlist and hand off to the user (checkpoint 1)
 
-Unlike before, the checklist's grouping is no longer cosmetic: group found items by their **actual newsletter section** (Corporate Tax and Trade / Corporate Legal / Corporate Risk), in that order, since that grouping now determines where each item lands in Step 4 — not a scan-source/theme grouping that gets discarded after selection. If a section has enough items that a sub-grouping would help readability, nest it under the section (e.g. "Corporate Tax and Trade — tax compliance", "Corporate Tax and Trade — trade/supply chain"), but the section-level grouping itself must stay intact and unambiguous.
+This checklist is **Corporate Tax and Trade only** — Corporate Legal and Corporate Risk items never appear on it, since the user supplies those two sections ready-made rather than picking from a shortlist (see "Three sections" above). Group found items by theme for readability if there are enough of them (e.g. "Tax compliance", "Trade/supply chain") — this grouping is just a scan-order convenience now, since every item on the checklist lands in the same section (Corporate Tax and Trade) regardless of which sub-group it's under.
 
-Present the shortlist as an interactive checklist Artifact, not a plain chat list — the user finds it much easier to review and check off dozens of items visually than to type out numbers. Read `references/checklist-template.html` and follow the fill-in instructions in its top comment: number every found item sequentially across all sections (1 through N), group by section first (see above), and flag borderline/low-relevance items with the `tag` field rather than dropping them. List "couldn't scan" sources (2B) or "skipped whole block" companies (2A) as plain text in your chat message below the artifact, not inside the checklist itself (they have nothing to check).
+Present the shortlist as an interactive checklist Artifact, not a plain chat list — the user finds it much easier to review and check off dozens of items visually than to type out numbers. Read `references/checklist-template.html` and follow the fill-in instructions in its top comment: number every found item sequentially (1 through N), group by theme for readability (see above), and flag borderline/low-relevance items with the `tag` field rather than dropping them. List "couldn't scan" sources (2B) or "skipped whole block" companies (2A) as plain text in your chat message below the artifact, not inside the checklist itself (they have nothing to check).
 
 Coming out of Step 2A, items won't have a real `url` yet — that's expected, not a gap to fill in before publishing. Leave `url` empty (the template's rendering just won't show a link for that item) rather than guessing or reusing an unrelated link, and don't burn time trying to locate sources for the *whole* shortlist before the user has even picked — that work only happens for the items they select (Step 4).
 
@@ -112,7 +112,7 @@ Whichever form it takes, confirm your interpretation of their selection back to 
 
 Read `references/format.md` now if you haven't already this run.
 
-No further categorization step here — whatever numbers the user gives you (e.g. "Include these numbered items in the newsletter: 5, 8"), each one goes under the section it was already grouped into on the Step 3 checklist, in the order given within that section. Don't ask them to re-categorize, and don't publish a separate categorize-view artifact — the section was already fixed at Step 3.
+Items the user selects from the Step 3 checklist (e.g. "Include these numbered items in the newsletter: 5, 8") are all Corporate Tax and Trade, in the order given — no categorization step needed, since that checklist only ever holds Tax and Trade candidates.
 
 **If any selected item came from Step 2A (a pasted digest) without a real `url` yet, this is where you find and verify it — not before.** For each such item:
 
@@ -120,6 +120,15 @@ No further categorization step here — whatever numbers the user gives you (e.g
 * Check that what you find actually matches what the digest described — company, action, and rough timing. A source that's in the right neighborhood but describes a different deal, an older version of the same product, or a different company entirely is not a match.
 * If nothing confirms the claim, or what you find contradicts it (e.g. the searches turn up the *other* company's own integration list and it doesn't mention this one), don't guess a plausible-looking link and don't drop it silently either — tell the user specifically what you checked and what didn't match, and ask whether they have a source or want it dropped. This happened with a "Kintsugi integrates with FreshBooks" claim that turned out to check out nowhere; flagging it beat either fabricating a citation or quietly cutting a story the user asked for.
 * Once confirmed, use that real, verified URL as the article's link — never the placeholder or a guessed URL.
+* Also watch for **staleness**, not just falseness: a claim can be entirely real and still be old news repackaged as this week's (e.g. a partnership announced months ago, a LinkedIn hire post from a prior quarter). Check the actual publish date of what you find, not just whether the claim checks out — if the underlying event predates this week's coverage window by more than a few days, flag it to the user as stale rather than presenting it as fresh.
+
+### Corporate Legal and Corporate Risk: light verification only, no sourcing triage
+
+The user supplies these two sections ready-made — a list of headline + URL pairs they've already picked. Don't run them through Step 2A/2B/2C triage or the Step 3 checklist (they skip straight here). For each one:
+
+* `WebSearch` to confirm the claim is real, matches what the user described, and is actually from this week's coverage window — not stale repackaged news (the same staleness check as above; this has caught real problems before, e.g. a months-old acquisition announcement and a quarter-old LinkedIn hire post slipping into an otherwise-fresh-looking list).
+* If something doesn't check out or looks stale, flag it specifically and ask whether to drop it or if the user has a better source — don't silently include or silently drop it.
+* Once confirmed, reframe the headline into house style (see `references/format.md`) the same way as any Tax and Trade article — simple present tense, no trailing period, no marketing jargon, one neutral factual sentence fully hyperlinked.
 
 Write a neutral, factual summary for each article — no opinion, no editorializing, just what happened and why it matters competitively. Format is uniform (see `references/format.md`): one active-voice sentence per article, with the whole thing hyperlinked — no separate headline/summary split, no section gets a longer paragraph treatment than any other.
 
@@ -127,7 +136,7 @@ The newsletter gets a single italic line "All summaries in this newsletter are A
 
 Fill in the HTML skeleton from `references/format.md` — masthead first (fixed content, only the date line changes), then the single AI-generated disclaimer line, then the three sections **in order** (Corporate Tax and Trade, Corporate Legal, Corporate Risk — even if one has no selected articles this week, see below), then the footer. Also draft a subject line: `Corporates Newsletter - <Month DD, YYYY>` (matches the real reference issue's own title style).
 
-If a section has zero selected articles for the week (expected for Corporate Legal/Corporate Risk until their sources are configured, or any section on a genuinely thin week), skip rendering that section's block entirely rather than showing an empty heading — don't invent filler to keep all three visible.
+If a section has zero articles for the week (expected for Corporate Legal/Corporate Risk on any week the user doesn't send items for them, or Corporate Tax and Trade on a genuinely thin week), skip rendering that section's block entirely rather than showing an empty heading — don't invent filler to keep all three visible.
 
 ## Step 5 — Review with the user (checkpoint 2)
 

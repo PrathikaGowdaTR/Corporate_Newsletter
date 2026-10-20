@@ -1,0 +1,172 @@
+# House style — Corporates Newsletter
+
+**Format locked.** Every value below (colors, font sizes, padding, the HTML skeleton) was iterated on and confirmed by the user and is now the standing house style — reuse it exactly, every week, without re-adjusting spacing/sizing/colors on your own judgment. Only change something here if the user explicitly asks for a style change in a given week; if they do, update this file to match immediately after (see `SKILL.md`) so the lock stays current instead of drifting out of sync with what was actually last approved.
+
+This is the HTML skeleton and formatting rules for the weekly Corporates Newsletter. Fill it in during Step 4/5 of `SKILL.md`. It's derived directly from `Corporates Newsletter format.html` at the repository root — a real past issue (exported from the newsletter's actual send platform) — so when in doubt, that file is the ground truth and this document is just a distilled version of it for filling in each week without re-reading 800 lines of markup.
+
+The final artifact gets copied as rendered rich text and pasted into Outlook, so every rule below exists to survive that round-trip: table-based layout, inline styles only, no `<style>` blocks, no flexbox/grid/`position`, no external CSS or JS. Outlook's rendering engine (Word) only reliably honors inline styles on `<table>`/`<td>`/`<font>`-era markup.
+
+## Colors
+
+Sampled directly from `Masthead.png` and the footer images so the HTML matches them exactly:
+
+| Use | Hex |
+|---|---|
+| Masthead / page background (light mint) | `#E3F3EE` |
+| Dark green (masthead top bar) | `#123121` |
+| Section heading band background | `#4D4D4D` |
+| Section heading text | `#FFFFFF` |
+| Muted grey (date line, footer subscribe line) | `#7E8C8D` |
+| Article link color | `#1155CC` |
+| AI-generated note | `#999999` |
+
+## Images: Masthead.png and FooterBottom.png
+
+Two fixed images live at the repository root and don't change week to week:
+
+- `Masthead.png` — the full masthead, **including the "Corporates Newsletter" title and tagline already baked into the image**. Don't add an HTML title overlay on top of it; that would duplicate the title. Just place the image and move on.
+- `FooterBottom.png` — just the blank gap and the Thomson Reuters logo. Everything else that used to be image-based in the footer (the "Quick links and resources" box, the subscribe line) is now real HTML text — see "Footer content" below.
+
+**Embed both as base64 `data:` URIs, not as Artifact `files` references.** An `<img src="Masthead.png">` served through the Artifact tool's `files` mechanism resolves to a URL scoped to that private artifact; when the rendered page is pasted into Outlook, Outlook has to fetch that URL to display the image, which can silently fail (no auth, no network path from its renderer) and break the pasted layout even though the artifact preview looked fine. `data:image/png;base64,...` puts the actual pixel bytes inline in the HTML, so nothing needs fetching — it survives copy/paste intact. If Bash/Python is available, base64-encode the two PNGs (e.g. `base64 -w0 Masthead.png`) and substitute the result into the `<img src="data:image/png;base64,...">` slots below; write the fully-substituted HTML to your scratchpad before publishing rather than inlining ~100KB of base64 directly in a tool call. If no script execution is available, fall back to the `files` parameter and flag to the user that pasted images may not survive into Outlook.
+
+```html
+<img src="data:image/png;base64,{{MASTHEAD_BASE64}}" width="650" alt="Corporates Newsletter" style="display:block;width:100%;max-width:650px;height:auto;border:0;">
+```
+
+## Footer content (real HTML, not images)
+
+Fixed values — reuse verbatim every week, don't ask the user to re-supply them:
+
+| Item | Value |
+|---|---|
+| Atrium link | `https://trten.sharepoint.com/sites/intr-market-and-competitive-intelligence/SitePages/Home.aspx?d=w970279f416814a03a74b94ed8525e336&csf=1&web=1&e=UAEdT1&CID=1a8866d7-45f2-4b36-b3af-4bf0da90f584` |
+| Viva Engage link | `https://engage.cloud.microsoft/main/org/tr.com/groups/eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIxMzg3MDU5MTE4MDgifQ/new` |
+| Contact email | `mci@thomsonreuters.com` |
+| Subscribe mailto | `mailto:mci@thomsonreuters.com?subject=Corporates%20Newsletter%3A%20Subscription&body=Hey%2C%20I%20would%20like%20to%20subscribe%20to%20the%20Corporates%20Newsletter.%20Thanks%21` |
+
+The "Quick links and resources" box: light-grey background (`#F5F5F5`), centered bold grey title, then a centered row of three items separated by `|`: Atrium (grey-teal `#46788A`, underlined), Viva Engage (blue `#1155CC`, underlined), and the email (blue `#1155CC`, plain — no underline, as a `mailto:` link). See the skeleton below for the exact markup. The subscribe line right below it is the same plain-grey, no-underline, no-highlight style as before.
+
+## Three sections, always in this order
+
+The newsletter has exactly three sections, always in this fixed order:
+
+1. **Corporate Tax and Trade**
+2. **Corporate Legal**
+3. **Corporate Risk**
+
+Every selected article goes under whichever section it was already assigned to at the Step 3 checklist stage, in the order the user gave within that section — don't re-categorize at this point. Each section repeats the same block structure (heading band, then articles) — see the skeleton below. If a section has no selected articles for the week, omit that section's entire block (heading included) rather than printing an empty heading.
+
+Each section heading is its own full-width band: grey background (`#4D4D4D`), bold white text, left-padded to match the rest of the layout — not a plain text line like before. See the skeleton below for the exact markup.
+
+## AI-generated disclaimer: once, at the top
+
+Unlike the per-section note used previously, there is now exactly **one** "All summaries in this newsletter are AI-generated." line, placed once as its own line directly under the date/confidentiality line — before the first section heading, not repeated after each section.
+
+## Article format is uniform
+
+Every article uses the same format: one fully neutral, factual sentence, active voice, and the *entire sentence* (not just the company name) is the hyperlink. Cover what happened and, if relevant, the stated business reason (e.g. "to expand into the EU e-invoicing market") — no separate headline/summary split, no opinion, no editorializing, no "impressively" / "unfortunately" / competitive spin.
+
+**No trailing full stop.** The sentence does not end in a period — drop it, same as a headline.
+
+**Simple present tense, not past tense.** "Sovos acquires Flowie" / "Vertex appoints Debanjan Saha," not "acquired" / "appointed" — every verb in every article sentence is simple present, regardless of when the underlying event happened.
+
+**No marketing jargon or self-praise lifted from the press release.** Drop framing like "forming what it calls the industry's first X," "industry-leading," "revolutionary," "unlocks," "seamless," "best-in-class," or any other language whose job is to sell rather than inform — state only the concrete facts (who did what, to/with whom, and the stated business reason if one is needed for clarity).
+
+**The sentence must name the action, not just describe the resulting capability.** "Tradeshift's AskAda for Sellers answers invoice questions in real time" tells the reader what the feature does today, not what news happened — a reader can't tell if this is a launch, an enhancement, or just existing-feature filler. Lead with the actual verb for what changed: launches, enhances, adds, expands, integrates, acquires, appoints, etc. ("Tradeshift enhances AskAda for Sellers, adding real-time, multilingual answers on invoice and payment status.") If the verification research doesn't make clear whether something is new or an update to something existing, that's a signal to dig one more search deep before writing the sentence, not to paper over it with capability-description phrasing.
+
+Occasionally the real reference combines two closely related stories into one linked paragraph with a line break between them (e.g. two personnel/product items from the same theme) — that's a judgment call for a genuinely tight pairing, not the default. Default to one article per line.
+
+Separate articles with a blank spacer row (see skeleton below), matching the reference's `<p>&nbsp;</p>` spacer pattern. Set `font-family:Arial,Helvetica,sans-serif` explicitly on every text-carrying tag (`<span>`, `<div>`, `<a>`) rather than relying on it cascading down from the outer table — copy/paste into Outlook doesn't always preserve inherited styles reliably, only ones stated directly on the element.
+
+**The spacer row's cell must use `font-size:1px;line-height:1px`, not the body's 12-13px.** A spacer cell inheriting the normal article font-size renders a ~15-16px-tall line box regardless of the `padding` value, which swamps small padding adjustments (a change from 8px to 2px is invisible against that line-height) — this is exactly the footer's `border-top` separator row technique, reused here. With `font-size:1px;line-height:1px`, the row's height is controlled almost entirely by `padding`, so adjusting the gap between articles actually does something visible.
+
+## HTML skeleton
+
+```html
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#E3F3EE;">
+  <tr>
+    <td align="center">
+      <table role="presentation" width="650" cellpadding="0" cellspacing="0" border="0" style="max-width:650px;background-color:#ffffff;font-family:Arial,Helvetica,sans-serif;">
+
+        <!-- Masthead (title is already baked into the image) -->
+        <tr>
+          <td>
+            <img src="data:image/png;base64,{{MASTHEAD_BASE64}}" width="650" alt="Corporates Newsletter" style="display:block;width:100%;max-width:650px;height:auto;border:0;">
+          </td>
+        </tr>
+
+        <!-- Date / confidentiality line -->
+        <tr>
+          <td style="padding:10px 24px;">
+            <span style="font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#7E8C8D;">{{ISSUE_DATE}} &nbsp;|&nbsp; This newsletter is confidential and strictly for internal purposes</span>
+          </td>
+        </tr>
+
+        <!-- AI-generated disclaimer: once, right after the date line, not repeated per section -->
+        <tr>
+          <td style="padding:0 24px 10px 24px;">
+            <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#999999;font-style:italic;">All summaries in this newsletter are AI-generated.</div>
+          </td>
+        </tr>
+
+        <!-- Section block — repeat this whole block once per section that has selected articles, -->
+        <!-- always in the fixed order: Corporate Tax and Trade, Corporate Legal, Corporate Risk. -->
+        <!-- Omit a section's entire block (heading included) if it has zero selected articles. -->
+        <tr>
+          <td style="background-color:#4D4D4D;padding:3px 24px;">
+            <div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;color:#FFFFFF;">{{SECTION_HEADING}}</div>
+          </td>
+        </tr>
+        <tr><td style="padding:7px 24px 0 24px;font-size:1px;line-height:1px;">&nbsp;</td></tr>
+
+        <!-- Repeat per article within the section -->
+        <tr>
+          <td style="padding:7px 24px 0 24px;">
+            <a href="{{ARTICLE_URL}}" style="font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#1155CC;text-decoration:none;">{{ONE ACTIVE-VOICE SENTENCE, FULLY LINKED}}</a>
+          </td>
+        </tr>
+        <tr><td style="padding:7px 24px 0 24px;font-size:1px;line-height:1px;">&nbsp;</td></tr>
+        <!-- (repeat the two rows above for each additional article in this section, omit the spacer after the last one) -->
+
+        <tr><td style="padding:10px 24px 0 24px;font-family:Arial,Helvetica,sans-serif;font-size:13px;">&nbsp;</td></tr>
+        <!-- (repeat the whole section block above for the next section, in fixed order — no per-section note anymore) -->
+
+        <!-- Footer: real "Quick links" box, real subscribe line, then the logo image -->
+        <tr>
+          <td style="background-color:#F5F5F5;padding:18px 24px;text-align:center;">
+            <div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:bold;color:#7E8C8D;">Quick links and resources</div>
+            <div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;margin-top:10px;">
+              <a href="https://trten.sharepoint.com/sites/intr-market-and-competitive-intelligence/SitePages/Home.aspx?d=w970279f416814a03a74b94ed8525e336&csf=1&web=1&e=UAEdT1&CID=1a8866d7-45f2-4b36-b3af-4bf0da90f584" style="color:#46788A;text-decoration:underline;">Atrium</a>
+              <span style="color:#333333;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+              <a href="https://engage.cloud.microsoft/main/org/tr.com/groups/eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiIxMzg3MDU5MTE4MDgifQ/new" style="color:#1155CC;text-decoration:underline;">Viva Engage</a>
+              <span style="color:#333333;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+              <a href="mailto:mci@thomsonreuters.com" style="color:#1155CC;text-decoration:none;">mci@thomsonreuters.com</a>
+            </div>
+          </td>
+        </tr>
+        <tr><td style="border-top:1px solid #DDDDDD;font-size:1px;line-height:1px;">&nbsp;</td></tr>
+        <tr>
+          <td style="padding:14px 24px;text-align:center;">
+            <a href="mailto:mci@thomsonreuters.com?subject=Corporates%20Newsletter%3A%20Subscription&body=Hey%2C%20I%20would%20like%20to%20subscribe%20to%20the%20Corporates%20Newsletter.%20Thanks%21" style="font-family:Arial,Helvetica,sans-serif;color:#7E8C8D;font-size:13px;text-decoration:none;">Click here to subscribe to the Corporates Newsletter</a>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <img src="data:image/png;base64,{{FOOTERBOTTOM_BASE64}}" width="650" alt="" style="display:block;width:100%;max-width:650px;height:auto;border:0;">
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+```
+
+Notes on filling it in:
+
+- `{{ISSUE_DATE}}` — the day you're sending, e.g. `September 22, 2026` (matches the reference's own date line, not the 7-day scan window).
+- `{{SECTION_HEADING}}` — one of the three fixed section names, in order: "Corporate Tax and Trade", "Corporate Legal", "Corporate Risk", rendered as a tight grey band (padding just enough to hug the text) with bold white text at 15px, followed by a one-line spacer row before the first article. Article text is 13px (smaller than the heading). Omit a section's whole block if it has no selected articles that week.
+- `{{MASTHEAD_BASE64}}`, `{{FOOTERBOTTOM_BASE64}}` — base64 of the two PNGs (see Images section above).
+- The "Quick links" box and subscribe line are real text/links, not images — the fixed URLs are in the table above, reuse them verbatim.
+- The AI-generated disclaimer appears exactly once, right under the date line — not once per section. Drop it only if every article across every section is verbatim/user-written text (shouldn't normally happen here).
+- Subject line convention: `Corporates Newsletter - {{Month DD, YYYY}}` (matches the reference issue's own title, which used a dash, not a colon).

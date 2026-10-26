@@ -171,3 +171,19 @@ Once approved:
 
 * Give the user the final HTML (they can copy it from the rendered Artifact) and the subject line.
 * Remind them: open a new email in Outlook, paste the copied rendered content into the body, fill in the "To" field themselves (distribution list is their own responsibility), and send it themselves. This skill does not send email or touch Outlook directly — there is no email tool available in this environment.
+
+## Step 7 — Append this week's Corporate Tax and Trade stories to the SharePoint database
+
+Once the draft is finalized (after Step 6, not before — only append stories that actually made the cut), append every **Corporate Tax and Trade** article used in this week's newsletter to the standing master Excel file on SharePoint. Corporate Legal and Corporate Risk are not included here — this export is Tax-and-Trade-only, matching `CTT_NL_Database.csv`'s own scope conventions for this file.
+
+**Requires the Microsoft 365 connector** (`mcp__Microsoft_365__*` tools) to be available this session — check before starting. If it isn't connected, skip this step and tell the user so, rather than silently doing nothing.
+
+* **File location**: `CTT_NL_Automated_Database.xlsx` inside the `Claude_automated_NL_DB` folder, itself inside `Corporate/Database` on the user's SharePoint site (`https://trten.sharepoint.com/sites/CorporateStrategy/...`). Use `mcp__Microsoft_365__sharepoint_folder_search` for `"Claude_automated_NL_DB"` to resolve the current `driveId`/`itemId` each session — don't hardcode them, since item ids are session-durable but shouldn't be assumed to survive indefinitely without checking.
+* **Columns** (7, in this order — a trimmed version of `CTT_NL_Database.csv`'s columns, dropping `Trend` and `International NL` since this export doesn't need them): `Year, Date, Headline, Weblink, Company name, Event type, Sub Segment`.
+* **Row format conventions** — match `CTT_NL_Database.csv`'s existing style so the two stay consistent:
+  * `Date` as `M/D/YYYY` (no leading zeros, e.g. `9/15/2026`), using the article's actual confirmed publish date where known; if no exact date was ever confirmed for a user-sourced item, use the newsletter's send date as a reasonable fallback rather than leaving it blank.
+  * `Headline` is the same house-style sentence used in the newsletter itself (the one hyperlinked in the HTML) — don't write a separate summary.
+  * `Company name` is the primary company the story is about (the subject performing the action, not a partner mentioned in passing).
+  * `Event type` and `Sub Segment` should follow the vocabulary already used in `CTT_NL_Database.csv` (e.g. `Partnership`, `Product Launch`, `Certification`, `Geographic expansion`, `Leadership change`, `M&A`, `Funding` for Event type; `Tax Compliance`, `E-invoicing`, `AP/AR Automation`, `SCM` for Sub Segment) — check the archive for the closest existing match rather than inventing new category names. An appointment/hire-only item can leave `Sub Segment` blank, matching the archive's own pattern for those.
+* **Appending, not overwriting**: read the existing file first (`mcp__Microsoft_365__read_resource` on its `file:///` URI) to get the current row count and avoid duplicating a row, then write the full updated file back with `mcp__Microsoft_365__sharepoint_update_file` (this replaces the whole file — rebuild it with all prior rows plus this week's new ones, not just this week's). Do not create a new file each week; there is exactly one standing file.
+* **Duplicate safety**: since this runs after Step 4's duplicate check, these rows shouldn't collide with existing archive entries, but a quick skim of the headlines already in the sheet for this week's companies is a cheap extra safeguard before writing.
